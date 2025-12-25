@@ -14,117 +14,49 @@
 
     <style>
         /* --- CSS Start --- */
-        :root {
-            --primary: #2E7D32; 
-            --accent: #FF5722;
-            --dark: #1b1f23;
-            --light: #ffffff;
-            --gray: #f5f5f5;
-        }
-
-        body {
-            font-family: 'Hind Siliguri', sans-serif;
-            margin: 0; padding: 0;
-            background-color: var(--gray);
-            padding-bottom: 70px;
-            overscroll-behavior-y: contain;
-        }
-
-        /* Header */
-        header {
-            background: var(--primary); color: white;
-            padding: 10px 15px; display: flex; align-items: center; justify-content: space-between;
-            position: sticky; top: 0; z-index: 1000;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-
+        :root { --primary: #2E7D32; --accent: #FF5722; --dark: #1b1f23; --light: #ffffff; --gray: #f5f5f5; }
+        body { font-family: 'Hind Siliguri', sans-serif; margin: 0; padding: 0; background-color: var(--gray); padding-bottom: 70px; overscroll-behavior-y: contain; }
+        
+        /* Header & Nav */
+        header { background: var(--primary); color: white; padding: 10px 15px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .logo { font-size: 1.2rem; font-weight: bold; display: flex; align-items: center; gap: 5px; }
         .cart-icon { position: relative; cursor: pointer; }
         .badge { position: absolute; top: -5px; right: -8px; background: var(--accent); color: white; border-radius: 50%; padding: 2px 5px; font-size: 10px; }
-
-        /* Carousel */
-        .carousel {
-            position: relative; width: 100%; height: 200px; overflow: hidden; background: #ddd;
-        }
-        .carousel img { width: 100%; height: 100%; object-fit: cover; transition: opacity 1s ease-in-out; }
         
-        /* Section Titles */
-        .section-title {
-            padding: 15px 15px 5px; font-size: 1.1rem; font-weight: 700; color: var(--dark);
-            display: flex; justify-content: space-between; align-items: center;
-        }
-
-        /* Product Card */
+        /* Carousel & Cards */
+        .carousel { position: relative; width: 100%; height: 200px; overflow: hidden; background: #ddd; }
+        .carousel img { width: 100%; height: 100%; object-fit: cover; transition: opacity 1s ease-in-out; }
+        .section-title { padding: 15px 15px 5px; font-size: 1.1rem; font-weight: 700; color: var(--dark); }
         .scroll-container { display: flex; overflow-x: auto; gap: 10px; padding: 10px 15px; scrollbar-width: none; }
         .scroll-container::-webkit-scrollbar { display: none; }
-
-        .card {
-            min-width: 150px; max-width: 150px; background: white;
-            border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            overflow: hidden; display: flex; flex-direction: column; position: relative;
-        }
+        .card { min-width: 150px; max-width: 150px; background: white; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; position: relative; }
         .card img { width: 100%; height: 110px; object-fit: cover; }
         .card-body { padding: 8px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
         .card-title { font-size: 0.95rem; font-weight: 600; margin: 0; line-height: 1.2; }
-        .card-price { color: var(--primary); font-weight: bold; margin-top: 5px; }
-        
-        .discount-tag {
-            position: absolute; top: 5px; right: 5px; background: var(--accent);
-            color: white; font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; font-weight: bold;
-        }
-
-        .btn-add {
-            background: var(--primary); color: white; border: none; 
-            width: 100%; padding: 6px; border-radius: 5px; margin-top: 5px; cursor: pointer;
-        }
+        .discount-tag { position: absolute; top: 5px; right: 5px; background: var(--accent); color: white; font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+        .btn-add { background: var(--primary); color: white; border: none; width: 100%; padding: 6px; border-radius: 5px; margin-top: 5px; cursor: pointer; }
         .btn-cancel { background: #d32f2f; }
-        .btn-secondary { background: #555; }
 
-        /* Floating Ad Popup */
-        .ad-popup {
-            position: fixed; top: 20px; right: 20px; width: 200px;
-            background: white; border: 2px solid var(--accent); border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 5000;
-            display: none; animation: popIn 0.5s ease;
-            padding: 10px; text-align: center;
-        }
-        @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
-        .ad-popup img { width: 100%; height: 100px; object-fit: cover; border-radius: 5px; }
-        .ad-close { position: absolute; top: -10px; right: -10px; background: red; color: white; border-radius: 50%; width: 25px; height: 25px; line-height: 25px; cursor: pointer; font-weight: bold; }
-
-        /* Modals */
-        .modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); z-index: 2000; align-items: center; justify-content: center;
-        }
-        .modal-content {
-            background: white; width: 90%; max-width: 400px; max-height: 90vh; 
-            overflow-y: auto; border-radius: 10px; padding: 20px; position: relative;
-        }
+        /* Modals & Sidebar */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; align-items: center; justify-content: center; }
+        .modal-content { background: white; width: 90%; max-width: 400px; max-height: 90vh; overflow-y: auto; border-radius: 10px; padding: 20px; position: relative; }
         .close-btn { position: absolute; top: 10px; right: 15px; font-size: 1.5rem; cursor: pointer; }
-
+        .sidebar { position: fixed; top: 0; left: -260px; width: 260px; height: 100%; background: white; z-index: 3000; transition: 0.3s; box-shadow: 2px 0 5px rgba(0,0,0,0.2); }
+        .sidebar.open { left: 0; }
+        .menu-item { padding: 15px; border-bottom: 1px solid #eee; display: block; color: #333; text-decoration: none; cursor: pointer; }
+        
         /* Admin & Forms */
         input, select, textarea { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
         .order-card { border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 5px; background: #fff; }
         .status-pending { color: orange; font-weight: bold; }
         .status-delivered { color: green; font-weight: bold; }
         .status-cancelled { color: red; font-weight: bold; }
-
-        /* Sidebar */
-        .sidebar {
-            position: fixed; top: 0; left: -260px; width: 260px; height: 100%;
-            background: white; z-index: 3000; transition: 0.3s;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.2); overflow-y: auto;
-        }
-        .sidebar.open { left: 0; }
-        .menu-item { padding: 15px; border-bottom: 1px solid #eee; display: block; color: #333; text-decoration: none; cursor: pointer; }
         
-        /* Bottom Nav */
-        .bottom-nav {
-            position: fixed; bottom: 0; width: 100%; background: white; 
-            display: flex; justify-content: space-around; padding: 10px 0;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 1000;
-        }
+        /* Floating Ad */
+        .ad-popup { position: fixed; top: 20px; right: 20px; width: 200px; background: white; border: 2px solid var(--accent); border-radius: 10px; z-index: 5000; display: none; padding: 10px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .ad-close { position: absolute; top: -10px; right: -10px; background: red; color: white; border-radius: 50%; width: 25px; height: 25px; line-height: 25px; cursor: pointer; }
+
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 1000; }
         .nav-item { text-align: center; font-size: 0.8rem; color: #666; cursor: pointer; text-decoration: none;}
         .nav-item.active { color: var(--primary); }
     </style>
@@ -138,7 +70,7 @@
         </div>
         <div class="menu-item" onclick="toggleSidebar(); window.scrollTo(0,0);">Home</div>
         <div class="menu-item" onclick="openOrderHistory()">My Orders</div>
-        <div class="menu-item" onclick="openModal('adminModal')" id="adminLink" style="display:none;">Admin Panel</div>
+        <div class="menu-item" onclick="openModal('adminModal'); loadAdminData();" id="adminLink" style="display:none; color: var(--primary); font-weight:bold;">Admin Panel</div>
         <div class="menu-item" onclick="handleLogout()" id="logoutBtn" style="display:none;">Logout</div>
     </div>
     <div class="modal" id="sidebarOverlay" onclick="toggleSidebar()" style="z-index: 2500; background: rgba(0,0,0,0);"></div>
@@ -148,51 +80,33 @@
             <i class="fas fa-bars" onclick="toggleSidebar()" style="cursor: pointer; margin-right: 10px;"></i>
             Neera Grocery
         </div>
-        <div style="display: flex; gap: 15px;">
-            <div class="cart-icon" onclick="openCart()">
-                <i class="fas fa-shopping-cart"></i>
-                <span class="badge" id="cartCount">0</span>
-            </div>
+        <div class="cart-icon" onclick="openCart()">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="badge" id="cartCount">0</span>
         </div>
     </header>
 
     <div id="adPopup" class="ad-popup">
         <div class="ad-close" onclick="closeAd()">&times;</div>
-        <small style="color:red; font-weight:bold; display:block; margin-bottom:5px;">⚡ Special Offer!</small>
-        <img id="adImg" src="">
-        <h4 id="adTitle" style="margin:5px 0;"></h4>
-        <button class="btn-add" onclick="goToAdProduct()">View Now</button>
-    </div>
-
-    <div style="background: #fff; color: var(--primary); padding: 5px; border-bottom: 1px solid #ddd;">
-        <marquee id="rollingNews">Welcome! Order now and get fast delivery.</marquee>
+        <small style="color:red; font-weight:bold;">⚡ Special Offer!</small>
+        <img id="adImg" src="" style="width:100%; height:100px; object-fit:cover; margin:5px 0;">
+        <h4 id="adTitle" style="margin:5px 0; font-size:0.9rem;"></h4>
+        <button class="btn-add" onclick="goToAdProduct()">View</button>
     </div>
 
     <div class="carousel" id="heroCarousel">
-        <img id="carouselImg" src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80" alt="Banner">
+        <img id="carouselImg" src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80">
     </div>
 
     <div class="section-title">Categories</div>
-    <div class="scroll-container" id="categoryList">
-        </div>
+    <div class="scroll-container" id="categoryList"></div>
 
-    <div class="section-title">
-        <span><i class="fas fa-tags" style="color:var(--accent)"></i> Special Offers</span>
-    </div>
-    <div class="scroll-container" id="offerList">
-        </div>
-
-    <div class="section-title">
-        <span><i class="fas fa-fire" style="color:orange"></i> Popular Now</span>
-    </div>
-    <div class="scroll-container" id="popularList">
-        </div>
+    <div class="section-title"><span><i class="fas fa-tags" style="color:var(--accent)"></i> Offers</span></div>
+    <div class="scroll-container" id="offerList"></div>
 
     <div class="section-title">All Products</div>
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px;" id="allProductsList">
-        </div>
-
-    <div style="height: 20px;"></div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px;" id="allProductsList"></div>
+    <div style="height: 50px;"></div>
 
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="window.scrollTo(0,0)"><i class="fas fa-home"></i><br>Home</div>
@@ -200,17 +114,13 @@
         <a href="https://wa.me/8801715247588" class="nav-item"><i class="fab fa-whatsapp"></i><br>Chat</a>
     </nav>
 
-
     <div id="productModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('productModal')">&times;</span>
             <img id="modalImg" src="" style="width:100%; height:200px; object-fit:cover; border-radius:10px;">
             <h2 id="modalTitle" style="margin:10px 0;"></h2>
-            <h3 style="color:var(--primary);">
-                <span id="modalPrice"></span> 
-                <span id="modalDiscount" style="font-size:0.8em; color:gray; text-decoration:line-through; margin-left:10px;"></span>
-            </h3>
-            <p id="modalDesc" style="white-space: pre-wrap; color:#555;"></p>
+            <h3 id="modalPrice" style="color:var(--primary);"></h3>
+            <p id="modalDesc" style="color:#555; white-space:pre-wrap;"></p>
             <button class="btn-add" onclick="addToCartFromModal()" style="padding:15px; font-size:1.1rem;">Add to Cart</button>
         </div>
     </div>
@@ -220,15 +130,14 @@
             <span class="close-btn" onclick="closeModal('cartModal')">&times;</span>
             <h2>Your Cart</h2>
             <div id="cartItems" style="max-height: 250px; overflow-y: auto;"></div>
-            <div style="border-top:1px solid #ddd; margin-top:10px; padding-top:10px; font-weight:bold; display:flex; justify-content:space-between;">
+            <div style="margin-top:10px; font-weight:bold; display:flex; justify-content:space-between;">
                 <span>Total:</span> <span id="cartTotal">0</span> BDT
             </div>
-            
-            <div id="checkoutSection">
-                <h3>Delivery Details</h3>
-                <input type="text" id="orderName" placeholder="Your Name" required>
-                <input type="text" id="orderPhone" placeholder="Phone Number" required>
-                <textarea id="orderAddress" placeholder="Full Delivery Address" required></textarea>
+            <div id="checkoutSection" style="margin-top:15px;">
+                <h3>Checkout</h3>
+                <input type="text" id="orderName" placeholder="Name" required>
+                <input type="text" id="orderPhone" placeholder="Phone" required>
+                <textarea id="orderAddress" placeholder="Address" required></textarea>
                 <button class="btn-add" style="background:#1b1f23; margin-top:10px;" onclick="processCheckout()">Confirm Order (COD)</button>
             </div>
         </div>
@@ -237,12 +146,11 @@
     <div id="authModal" class="modal">
         <div class="modal-content" style="text-align: center;">
             <span class="close-btn" onclick="closeModal('authModal')">&times;</span>
-            <h2 id="authTitle">Login Required</h2>
-            <p>Please login to place order or view history.</p>
+            <h2>Login / Signup</h2>
             <input type="email" id="authEmail" placeholder="Email">
             <input type="password" id="authPass" placeholder="Password">
-            <button class="btn-add" onclick="handleAuth()">Login / Sign Up</button>
-            <p id="authMsg" style="color:red; font-size:0.8rem; margin-top:5px;"></p>
+            <button class="btn-add" onclick="handleAuth()">Submit</button>
+            <p id="authMsg" style="color:red; margin-top:5px;"></p>
         </div>
     </div>
 
@@ -250,8 +158,7 @@
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('historyModal')">&times;</span>
             <h2>My Orders</h2>
-            <div id="orderList" style="max-height: 60vh; overflow-y: auto;">
-                </div>
+            <div id="orderList" style="max-height: 60vh; overflow-y: auto;"></div>
         </div>
     </div>
 
@@ -260,50 +167,46 @@
             <span class="close-btn" onclick="closeModal('adminModal')">&times;</span>
             <h2>Admin Dashboard</h2>
             
-            <div style="display:flex; gap:10px; margin-bottom:15px;">
-                <button onclick="showAdminTab('prod')" class="btn-add" style="flex:1;">Products</button>
-                <button onclick="showAdminTab('ord')" class="btn-add" style="flex:1; background:var(--accent);">Orders</button>
-                <button onclick="showAdminTab('set')" class="btn-add" style="flex:1; background:#555;">Settings</button>
+            <div style="display:flex; gap:5px; margin-bottom:15px;">
+                <button onclick="showAdminTab('Prod')" class="btn-add" style="flex:1;">Products</button>
+                <button onclick="showAdminTab('Ord')" class="btn-add" style="flex:1; background:var(--accent);">Orders</button>
+                <button onclick="showAdminTab('Set')" class="btn-add" style="flex:1; background:#555;">Settings</button>
             </div>
 
             <div id="adminProdTab">
-                <h3>Add/Edit Product</h3>
-                <input type="hidden" id="pId"> <input type="text" id="pName" placeholder="Product Name">
-                <input type="number" id="pPrice" placeholder="Price (BDT)">
-                <input type="number" id="pDiscount" placeholder="Discount % (Optional)">
-                <select id="pCatSelect">
-                    </select>
-                <small>Image (Use small size &lt; 500KB):</small>
+                <h3>Product Manager</h3>
+                <input type="hidden" id="pId">
+                <input type="text" id="pName" placeholder="Product Name">
+                <input type="number" id="pPrice" placeholder="Price">
+                <input type="number" id="pDiscount" placeholder="Discount %">
+                <select id="pCatSelect"></select>
                 <input type="file" onchange="encodeImage(this, 'pImgBase64')">
                 <input type="hidden" id="pImgBase64">
-                <textarea id="pDesc" rows="3" placeholder="Description (Line breaks allowed)"></textarea>
-                
+                <textarea id="pDesc" rows="3" placeholder="Description"></textarea>
                 <div style="display:flex; gap:10px; margin:5px 0;">
-                    <label><input type="checkbox" id="pIsPop" style="width:auto;"> Popular</label>
-                    <label><input type="checkbox" id="pIsSpecial" style="width:auto;"> Special Offer</label>
+                    <label><input type="checkbox" id="pIsPop"> Popular</label>
+                    <label><input type="checkbox" id="pIsSpecial"> Special</label>
                 </div>
-                
                 <button class="btn-add" onclick="saveProduct()">Save Product</button>
-                <button class="btn-add btn-secondary" onclick="resetAdminForm()">Clear Form</button>
+                <button class="btn-add" style="background:#777;" onclick="resetAdminForm()">Clear</button>
             </div>
 
             <div id="adminOrdTab" style="display:none;">
-                <h3>Manage Orders</h3>
-                <div id="adminOrderList" style="max-height:300px; overflow-y:auto; background:#f9f9f9; padding:5px;"></div>
+                <h3>All Customer Orders</h3>
+                <div id="adminOrderList" style="max-height:300px; overflow-y:auto; background:#f9f9f9; padding:5px;">
+                    Loading orders...
+                </div>
             </div>
 
             <div id="adminSetTab" style="display:none;">
-                <h3>Banner Carousel</h3>
-                <small>Upload Landscape Image (Max 800KB):</small>
-                <input type="file" onchange="uploadBanner(this)">
-                <div id="bannerList" style="display:flex; gap:5px; overflow-x:auto; margin-top:5px;"></div>
-                
-                <h3 style="margin-top:20px;">Categories</h3>
+                <h3>Settings</h3>
+                <p><b>Add Category:</b></p>
                 <div style="display:flex; gap:5px;">
-                    <input type="text" id="newCatName" placeholder="New Category Name">
-                    <button class="btn-add" style="width:60px;" onclick="addCategory()">Add</button>
+                    <input type="text" id="newCatName" placeholder="New Category">
+                    <button class="btn-add" style="width:80px;" onclick="addCategory()">Add</button>
                 </div>
-                <div id="adminCatList" style="display:flex; flex-wrap:wrap; gap:5px; margin-top:5px;"></div>
+                <p style="margin-top:15px;"><b>Update Banner:</b></p>
+                <input type="file" onchange="uploadBanner(this)">
             </div>
         </div>
     </div>
@@ -311,7 +214,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot, query, where, getDocs, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, doc, updateDoc, onSnapshot, query, where, getDocs, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDmhCAUKAu6wptvSazTIzXzqB1hsaPEcNk",
@@ -326,49 +229,50 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // --- GLOBAL STATE ---
+        // --- STATE ---
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
         let products = [];
         let categories = ['Grocery', 'Fruits', 'Vegetables'];
         let currentUser = null;
         let adInterval = null;
 
-        // --- UI HELPERS ---
+        // --- UI UTILS ---
         window.openModal = (id) => document.getElementById(id).style.display = 'flex';
         window.closeModal = (id) => document.getElementById(id).style.display = 'none';
         window.toggleSidebar = () => document.getElementById('sidebar').classList.toggle('open');
-        window.showAdminTab = (tab) => {
-            ['Prod','Ord','Set'].forEach(t => document.getElementById('admin'+t+'Tab').style.display = 'none');
-            document.getElementById('admin'+tab+'Tab').style.display = 'block';
+        
+        // **FIXED ADMIN TAB FUNCTION**
+        window.showAdminTab = (tabName) => {
+            // Safe check for elements before styling
+            const tabs = ['adminProdTab', 'adminOrdTab', 'adminSetTab'];
+            tabs.forEach(t => {
+                const el = document.getElementById(t);
+                if(el) el.style.display = 'none';
+            });
+            const target = document.getElementById('admin' + tabName + 'Tab');
+            if(target) target.style.display = 'block';
         };
 
-        // --- AUTH SYSTEM ---
+        // --- AUTH ---
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
-            const logoutBtn = document.getElementById('logoutBtn');
-            const adminLink = document.getElementById('adminLink');
-            const emailDisplay = document.getElementById('menuUserEmail');
-
             if(user) {
-                if(emailDisplay) emailDisplay.innerText = user.email;
-                if(logoutBtn) logoutBtn.style.display = 'block';
+                document.getElementById('menuUserEmail').innerText = user.email;
+                document.getElementById('logoutBtn').style.display = 'block';
+                // Admin check
                 if(user.email === 'neera.shop@gmail.com') {
-                    if(adminLink) adminLink.style.display = 'block';
-                    loadAdminData(); // Admin Only Load
+                    document.getElementById('adminLink').style.display = 'block';
                 }
             } else {
-                if(emailDisplay) emailDisplay.innerText = 'Guest';
-                if(logoutBtn) logoutBtn.style.display = 'none';
-                if(adminLink) adminLink.style.display = 'none';
+                document.getElementById('menuUserEmail').innerText = 'Guest';
+                document.getElementById('logoutBtn').style.display = 'none';
+                document.getElementById('adminLink').style.display = 'none';
             }
         });
 
         window.handleAuth = async () => {
             const e = document.getElementById('authEmail').value;
             const p = document.getElementById('authPass').value;
-            const msg = document.getElementById('authMsg');
-            msg.innerText = "Processing...";
-            
             try {
                 await signInWithEmailAndPassword(auth, e, p);
                 closeModal('authModal');
@@ -379,60 +283,41 @@
                     closeModal('authModal');
                     if(cart.length > 0) openCart();
                 } catch (err2) {
-                    msg.innerText = err2.message;
+                    alert(err2.message);
                 }
             }
         };
 
-        window.handleLogout = () => {
-            signOut(auth).then(() => {
-                alert('Logged out');
-                window.location.reload();
-            });
-        };
+        window.handleLogout = () => signOut(auth).then(() => window.location.reload());
 
-        // --- PRODUCTS SYSTEM (No Index Required) ---
-        const renderProducts = () => {
-            // Simplified Query: No orderBy in DB to prevent Index Error
-            const q = collection(db, "products"); 
-            
-            onSnapshot(q, (snap) => {
+        // --- PRODUCTS ---
+        const renderApp = () => {
+            onSnapshot(collection(db, "products"), (snap) => {
                 products = [];
                 snap.forEach(d => products.push({id: d.id, ...d.data()}));
-                
-                // Sort in JavaScript instead of Database
-                products.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+                products.sort((a,b) => (a.name||"").localeCompare(b.name||""));
 
-                let allHtml = '', popHtml = '', offerHtml = '';
-                
+                let all='', pop='', off='';
                 products.forEach(p => {
                     const card = createCard(p);
-                    allHtml += card;
-                    if(p.isPop) popHtml += card;
-                    if(p.isSpecial || (p.discount && p.discount > 0)) offerHtml += card;
+                    all += card;
+                    if(p.isPop) pop += card;
+                    if(p.isSpecial || p.discount > 0) off += card;
                 });
 
-                const allList = document.getElementById('allProductsList');
-                if(allList) allList.innerHTML = allHtml;
-                
-                const popList = document.getElementById('popularList');
-                if(popList) popList.innerHTML = popHtml;
-                
-                const offList = document.getElementById('offerList');
-                if(offList) offList.innerHTML = offerHtml;
-                
+                document.getElementById('allProductsList').innerHTML = all;
+                document.getElementById('offerList').innerHTML = off;
                 startAdLoop();
             });
 
-            // Settings Listener
             onSnapshot(collection(db, "settings"), (snap) => {
                 snap.forEach(d => {
                     if(d.id === 'categories') {
                         categories = d.data().list || [];
                         renderCategories();
                     }
-                    if(d.id === 'banners') {
-                        renderCarousel(d.data().images || []);
+                    if(d.id === 'banners' && d.data().images) {
+                        document.getElementById('carouselImg').src = d.data().images[0];
                     }
                 });
             });
@@ -440,269 +325,64 @@
 
         function createCard(p) {
             const img = p.image || 'https://placehold.co/150';
-            let displayPrice = `৳ ${p.price}`;
-            let discTag = '';
-            
-            if (p.discount && p.discount > 0) {
-                const discounted = Math.round(p.price * (1 - p.discount/100));
-                displayPrice = `<span style="text-decoration:line-through; color:#999; font-size:0.8em">${p.price}</span> ৳${discounted}`;
-                discTag = `<div class="discount-tag">-${p.discount}%</div>`;
-            }
+            const price = p.discount ? Math.round(p.price * (1 - p.discount/100)) : p.price;
+            const dispPrice = p.discount ? `<s style="color:#999">${p.price}</s> ৳${price}` : `৳${price}`;
+            const tag = p.discount ? `<div class="discount-tag">-${p.discount}%</div>` : '';
 
             return `
             <div class="card">
-                ${discTag}
-                <img src="${img}" loading="lazy" onclick="showDetails('${p.id}')" onerror="this.src='https://placehold.co/150'">
+                ${tag}
+                <img src="${img}" onclick="showDetails('${p.id}')">
                 <div class="card-body">
                     <div class="card-title" onclick="showDetails('${p.id}')">${p.name}</div>
-                    <div class="card-price">${displayPrice}</div>
+                    <div style="color:var(--primary); font-weight:bold;">${dispPrice}</div>
                     <button class="btn-add" onclick="addToCart('${p.id}')">Add</button>
-                    ${currentUser && currentUser.email === 'neera.shop@gmail.com' ? 
-                        `<small onclick="editProduct('${p.id}')" style="color:blue; cursor:pointer; text-align:center; display:block; margin-top:5px;">Edit</small>` : ''}
+                    ${currentUser?.email === 'neera.shop@gmail.com' ? `<small onclick="editProduct('${p.id}')" style="color:blue;cursor:pointer;text-align:center;">Edit</small>` : ''}
                 </div>
             </div>`;
         }
 
         function renderCategories() {
-            const list = document.getElementById('categoryList');
-            const select = document.getElementById('pCatSelect');
-            if(!list || !select) return;
-
-            let catHtml = '';
-            let optHtml = '';
-            
-            categories.forEach(c => {
-                catHtml += `<div style="min-width:80px; text-align:center; padding:10px; background:white; border-radius:10px; box-shadow:0 2px 5px #ddd;">${c}</div>`;
-                optHtml += `<option value="${c}">${c}</option>`;
-            });
-            
-            list.innerHTML = catHtml;
-            select.innerHTML = optHtml;
+            const html = categories.map(c => `<div style="min-width:80px; text-align:center; padding:10px; background:white; border-radius:10px; box-shadow:0 2px 5px #ddd;">${c}</div>`).join('');
+            document.getElementById('categoryList').innerHTML = html;
+            document.getElementById('pCatSelect').innerHTML = categories.map(c => `<option value="${c}">${c}</option>`).join('');
         }
 
-        // --- CAROUSEL ---
-        let carouselInterval;
-        function renderCarousel(images) {
-            if(!images || images.length === 0) return;
-            const imgEl = document.getElementById('carouselImg');
-            if(!imgEl) return;
-
-            if(carouselInterval) clearInterval(carouselInterval);
-            let i = 0;
-            imgEl.src = images[0];
-            
-            carouselInterval = setInterval(() => {
-                i = (i + 1) % images.length;
-                imgEl.style.opacity = 0;
-                setTimeout(() => {
-                    imgEl.src = images[i];
-                    imgEl.style.opacity = 1;
-                }, 500);
-            }, 5000);
-        }
-
-        // --- CART & CHECKOUT ---
-        window.addToCart = (id) => {
-            const p = products.find(x => x.id === id);
-            if(p) {
-                cart.push(p);
-                updateCartUI();
-                const btn = event.target;
-                const oldText = btn.innerText;
-                btn.innerText = "Added!";
-                setTimeout(()=> btn.innerText = oldText, 1000);
-            }
-        };
-
-        function updateCartUI() {
-            const countEl = document.getElementById('cartCount');
-            if(countEl) countEl.innerText = cart.length;
-            localStorage.setItem('cart', JSON.stringify(cart));
-            
-            const list = document.getElementById('cartItems');
-            if(!list) return;
-
-            let total = 0;
-            let html = '';
-            cart.forEach((item, idx) => {
-                const price = item.discount ? Math.round(item.price * (1 - item.discount/100)) : item.price;
-                total += parseInt(price);
-                html += `
-                    <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:5px; align-items:center;">
-                        <span>${item.name}</span>
-                        <span>৳${price} <i class="fas fa-trash" style="color:red; cursor:pointer; margin-left:10px;" onclick="removeFromCart(${idx})"></i></span>
-                    </div>`;
-            });
-            list.innerHTML = html;
-            document.getElementById('cartTotal').innerText = total;
-        }
-
-        window.removeFromCart = (idx) => { cart.splice(idx, 1); updateCartUI(); };
-        window.openCart = () => { updateCartUI(); openModal('cartModal'); };
-
-        window.processCheckout = async () => {
-            if(!currentUser) {
-                closeModal('cartModal');
-                openModal('authModal');
-                return;
-            }
-            
-            const name = document.getElementById('orderName').value;
-            const phone = document.getElementById('orderPhone').value;
-            const addr = document.getElementById('orderAddress').value;
-
-            if(!name || !phone || !addr || cart.length === 0) {
-                alert("Please fill details & add items.");
-                return;
-            }
-
-            const btn = document.querySelector('#checkoutSection button');
-            btn.innerText = "Processing...";
-            btn.disabled = true;
-
-            const order = {
-                userId: currentUser.uid,
-                userEmail: currentUser.email,
-                name, phone, address: addr,
-                items: cart,
-                total: document.getElementById('cartTotal').innerText,
-                status: 'Pending',
-                date: new Date().toISOString()
-            };
-
-            try {
-                await addDoc(collection(db, "orders"), order);
-                alert("Order Placed Successfully!");
-                cart = [];
-                updateCartUI();
-                closeModal('cartModal');
-            } catch (e) {
-                alert("Error: " + e.message);
-            } finally {
-                btn.innerText = "Confirm Order (COD)";
-                btn.disabled = false;
-            }
-        };
-
-        // --- ORDER HISTORY (No Index Required) ---
-        window.openOrderHistory = async () => {
-            if(!currentUser) { openModal('authModal'); return; }
-            
-            openModal('historyModal');
-            const list = document.getElementById('orderList');
-            list.innerHTML = '<p style="text-align:center;">Loading orders...</p>';
-            
-            // Simplified Query: Only Filter, No Sort
-            const q = query(collection(db, "orders"), where("userId", "==", currentUser.uid));
-            
-            try {
-                const snaps = await getDocs(q);
-                let html = '';
-                
-                if(snaps.empty) {
-                    list.innerHTML = '<p style="text-align:center;">No orders found.</p>';
-                    return;
-                }
-
-                // JS Sort (Newest first)
-                let myOrders = [];
-                snaps.forEach(d => myOrders.push({id: d.id, ...d.data()}));
-                myOrders.sort((a,b) => new Date(b.date) - new Date(a.date));
-
-                myOrders.forEach(o => {
-                    const canCancel = o.status !== 'Delivered' && o.status !== 'Cancelled';
-                    const dateStr = new Date(o.date).toLocaleDateString();
-                    const itemNames = o.items.map(i=>i.name).join(', ');
-                    
-                    html += `
-                        <div class="order-card">
-                            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                                <b>${dateStr}</b>
-                                <span class="status-${o.status.toLowerCase()}">${o.status}</span>
-                            </div>
-                            <div style="font-size:0.9rem; color:#555;">${itemNames}</div>
-                            <div style="font-weight:bold; margin-top:5px;">Total: ৳${o.total}</div>
-                            ${canCancel ? `<button class="btn-add btn-cancel" onclick="cancelOrder('${o.id}')" style="margin-top:10px;">Cancel Order</button>` : ''}
-                        </div>`;
-                });
-                list.innerHTML = html;
-            } catch (e) {
-                list.innerHTML = `<p style="color:red">Error: ${e.message}</p>`;
-            }
-        };
-
-        window.cancelOrder = async (oid) => {
-            if(confirm("Cancel this order?")) {
-                await updateDoc(doc(db, "orders", oid), { status: "Cancelled" });
-                openOrderHistory();
-            }
-        };
-
-        // --- ADMIN PANEL (No Index Required) ---
+        // --- ADMIN FUNCTIONS ---
         window.loadAdminData = () => {
-            // Simplified Query: No orderBy in DB
-            const q = collection(db, "orders");
-            
-            onSnapshot(q, (snap) => {
+            // This loads ALL orders for the Admin Panel
+            onSnapshot(collection(db, "orders"), (snap) => {
                 const list = document.getElementById('adminOrderList');
                 if(!list) return;
                 
                 let orders = [];
                 snap.forEach(d => orders.push({id: d.id, ...d.data()}));
-                
-                // JS Sort (Newest first)
                 orders.sort((a,b) => new Date(b.date) - new Date(a.date));
 
-                let html = '';
-                orders.forEach(o => {
-                    const itemStr = o.items ? o.items.map(i=>i.name).join(', ') : 'No items';
-                    html += `
-                        <div class="order-card">
-                            <small>${new Date(o.date).toLocaleString()}</small><br>
-                            <strong>${o.name} - ${o.phone}</strong><br>
-                            Items: ${itemStr} - ৳${o.total}<br>
-                            <select onchange="updateOrderStatus('${o.id}', this.value)" style="margin-top:5px; background:${o.status==='Pending'?'#fff3cd':'#d4edda'}">
-                                <option value="Pending" ${o.status=='Pending'?'selected':''}>Pending</option>
-                                <option value="Delivered" ${o.status=='Delivered'?'selected':''}>Delivered</option>
-                                <option value="Cancelled" ${o.status=='Cancelled'?'selected':''}>Cancelled</option>
-                            </select>
-                        </div>`;
-                });
-                list.innerHTML = html;
-            });
-        }
-
-        window.updateOrderStatus = async (oid, status) => {
-            await updateDoc(doc(db, "orders", oid), { status });
-        };
-
-        window.encodeImage = (el, targetId) => {
-            const file = el.files[0];
-            if(!file) return;
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = (e) => {
-                // Resize Image logic
-                const img = new Image();
-                img.src = e.target.result;
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const mw = 400; // Max Width 400px
-                    const sc = mw / img.width;
-                    canvas.width = mw;
-                    canvas.height = img.height * sc;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    document.getElementById(targetId).value = canvas.toDataURL('image/jpeg', 0.7);
-                    alert("Image Ready!");
+                if(orders.length === 0) {
+                    list.innerHTML = "No orders found.";
+                    return;
                 }
-            }
+
+                list.innerHTML = orders.map(o => `
+                    <div class="order-card">
+                        <small>${new Date(o.date).toLocaleString()}</small><br>
+                        <strong>${o.name} (${o.phone})</strong><br>
+                        Address: ${o.address}<br>
+                        Items: ${o.items.map(i=>i.name).join(', ')} (Total: ৳${o.total})<br>
+                        <select onchange="updateOrderStatus('${o.id}', this.value)" style="background:${o.status==='Pending'?'#fff3cd':'#d4edda'}">
+                            <option value="Pending" ${o.status=='Pending'?'selected':''}>Pending</option>
+                            <option value="Delivered" ${o.status=='Delivered'?'selected':''}>Delivered</option>
+                            <option value="Cancelled" ${o.status=='Cancelled'?'selected':''}>Cancelled</option>
+                        </select>
+                    </div>
+                `).join('');
+            });
         };
+
+        window.updateOrderStatus = (oid, status) => updateDoc(doc(db, "orders", oid), { status });
 
         window.saveProduct = async () => {
-            const btn = event.target;
-            btn.innerText = "Saving...";
-            
             const id = document.getElementById('pId').value;
             const data = {
                 name: document.getElementById('pName').value,
@@ -713,23 +393,45 @@
                 isPop: document.getElementById('pIsPop').checked,
                 isSpecial: document.getElementById('pIsSpecial').checked
             };
-            
-            const imgVal = document.getElementById('pImgBase64').value;
-            if(imgVal) data.image = imgVal;
+            const img = document.getElementById('pImgBase64').value;
+            if(img) data.image = img;
 
             try {
-                if(id) {
-                    await updateDoc(doc(db, "products", id), data);
-                } else {
-                    await addDoc(collection(db, "products"), data);
-                }
+                if(id) await updateDoc(doc(db, "products", id), data);
+                else await addDoc(collection(db, "products"), data);
                 alert("Saved!");
                 resetAdminForm();
-            } catch(e) {
-                alert("Error: " + e.message);
-            } finally {
-                btn.innerText = "Save Product";
+            } catch(e) { alert("Error: "+e.message); }
+        };
+
+        window.encodeImage = (el, tid) => {
+            if(el.files && el.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    // Simple Resize
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const scale = 400 / img.width;
+                        canvas.width = 400;
+                        canvas.height = img.height * scale;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        document.getElementById(tid).value = canvas.toDataURL('image/jpeg', 0.7);
+                    }
+                };
+                reader.readAsDataURL(el.files[0]);
             }
+        };
+
+        window.resetAdminForm = () => {
+            document.getElementById('pId').value = '';
+            document.querySelectorAll('#adminProdTab input').forEach(i => {
+                if(i.type==='text'||i.type==='number') i.value='';
+                if(i.type==='checkbox') i.checked=false;
+            });
+            document.getElementById('pImgBase64').value = '';
         };
 
         window.editProduct = (id) => {
@@ -739,92 +441,150 @@
             document.getElementById('pPrice').value = p.price;
             document.getElementById('pDiscount').value = p.discount;
             document.getElementById('pDesc').value = p.description;
-            document.getElementById('pCatSelect').value = p.category;
             document.getElementById('pIsPop').checked = p.isPop;
             document.getElementById('pIsSpecial').checked = p.isSpecial;
             openModal('adminModal');
-            showAdminTab('prod');
-        };
-
-        window.resetAdminForm = () => {
-            document.getElementById('pId').value = '';
-            document.querySelectorAll('#adminProdTab input').forEach(i => {
-                if(i.type !== 'checkbox' && i.type !== 'file' && i.type !== 'hidden') i.value = '';
-                if(i.type === 'checkbox') i.checked = false;
-            });
-            document.getElementById('pDesc').value = '';
-            document.getElementById('pImgBase64').value = '';
+            showAdminTab('Prod');
         };
 
         window.addCategory = async () => {
-            const newCat = document.getElementById('newCatName').value;
-            if(newCat) {
-                categories.push(newCat);
+            const val = document.getElementById('newCatName').value;
+            if(val) {
+                categories.push(val);
                 await setDoc(doc(db, "settings", "categories"), { list: categories });
-                document.getElementById('newCatName').value = '';
                 alert("Category Added!");
             }
         };
 
         window.uploadBanner = (el) => {
-            const file = el.files[0];
-            if(!file) return;
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = async (e) => {
-                 await setDoc(doc(db, "settings", "banners"), { images: [e.target.result] }, {merge: true}); 
-                 alert("Banner Updated!");
+            if(el.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    setDoc(doc(db, "settings", "banners"), { images: [e.target.result] }, {merge:true});
+                    alert("Banner Updated!");
+                };
+                reader.readAsDataURL(el.files[0]);
+            }
+        };
+
+        // --- CART & ORDERS ---
+        window.addToCart = (id) => {
+            const p = products.find(x => x.id === id);
+            if(p) { cart.push(p); updateCartUI(); }
+        };
+
+        function updateCartUI() {
+            document.getElementById('cartCount').innerText = cart.length;
+            localStorage.setItem('cart', JSON.stringify(cart));
+            
+            const list = document.getElementById('cartItems');
+            let total = 0;
+            list.innerHTML = cart.map((item, i) => {
+                const price = item.discount ? Math.round(item.price*(1-item.discount/100)) : item.price;
+                total += parseInt(price);
+                return `<div style="display:flex; justify-content:space-between; padding:5px; border-bottom:1px solid #eee;">
+                    <span>${item.name}</span>
+                    <span>৳${price} <i class="fas fa-trash" style="color:red; cursor:pointer;" onclick="removeFromCart(${i})"></i></span>
+                </div>`;
+            }).join('');
+            document.getElementById('cartTotal').innerText = total;
+        }
+
+        window.removeFromCart = (i) => { cart.splice(i,1); updateCartUI(); };
+        window.openCart = () => { updateCartUI(); openModal('cartModal'); };
+
+        window.processCheckout = async () => {
+            if(!currentUser) { closeModal('cartModal'); openModal('authModal'); return; }
+            const name = document.getElementById('orderName').value;
+            const phone = document.getElementById('orderPhone').value;
+            const addr = document.getElementById('orderAddress').value;
+            
+            if(!name || !phone || !addr || cart.length === 0) return alert("Fill all details & add items!");
+            
+            const order = {
+                userId: currentUser.uid,
+                userEmail: currentUser.email,
+                name, phone, address: addr,
+                items: cart,
+                total: document.getElementById('cartTotal').innerText,
+                status: 'Pending',
+                date: new Date().toISOString()
+            };
+            
+            try {
+                await addDoc(collection(db, "orders"), order);
+                alert("Order Placed!");
+                cart = []; updateCartUI(); closeModal('cartModal');
+            } catch(e) { alert(e.message); }
+        };
+
+        window.openOrderHistory = async () => {
+            if(!currentUser) { openModal('authModal'); return; }
+            openModal('historyModal');
+            const list = document.getElementById('orderList');
+            list.innerHTML = 'Loading...';
+            
+            const q = query(collection(db, "orders"), where("userId", "==", currentUser.uid));
+            const snaps = await getDocs(q);
+            
+            if(snaps.empty) { list.innerHTML = "No orders found."; return; }
+            
+            let myOrders = [];
+            snaps.forEach(d => myOrders.push({id: d.id, ...d.data()}));
+            myOrders.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+            list.innerHTML = myOrders.map(o => `
+                <div class="order-card">
+                    <div style="display:flex; justify-content:space-between;">
+                        <b>${new Date(o.date).toLocaleDateString()}</b>
+                        <span class="status-${o.status.toLowerCase()}">${o.status}</span>
+                    </div>
+                    <p>${o.items.map(i=>i.name).join(', ')}</p>
+                    <p>Total: ৳${o.total}</p>
+                    ${o.status!=='Delivered' && o.status!=='Cancelled' ? `<button class="btn-add btn-cancel" onclick="cancelOrder('${o.id}')">Cancel</button>` : ''}
+                </div>
+            `).join('');
+        };
+
+        window.cancelOrder = async (oid) => {
+            if(confirm("Cancel Order?")) {
+                await updateDoc(doc(db, "orders", oid), { status: 'Cancelled' });
+                openOrderHistory();
             }
         };
 
         // --- EXTRAS ---
         window.showDetails = (id) => {
             const p = products.find(x => x.id === id);
-            if(!p) return;
             document.getElementById('modalImg').src = p.image || '';
             document.getElementById('modalTitle').innerText = p.name;
-            const dPrice = p.discount ? Math.round(p.price * (1 - p.discount/100)) : p.price;
-            document.getElementById('modalPrice').innerHTML = `৳${dPrice}`;
-            document.getElementById('modalDiscount').innerText = p.discount ? `Regular: ৳${p.price}` : '';
-            document.getElementById('modalDesc').innerText = p.description || 'No description';
-            window.currentDetailsId = id;
+            const price = p.discount ? Math.round(p.price * (1 - p.discount/100)) : p.price;
+            document.getElementById('modalPrice').innerText = `৳${price}`;
+            document.getElementById('modalDesc').innerText = p.description || '';
+            window.currPid = id;
             openModal('productModal');
         };
-
-        window.addToCartFromModal = () => {
-            if(window.currentDetailsId) addToCart(window.currentDetailsId);
-            closeModal('productModal');
-        };
+        window.addToCartFromModal = () => { if(window.currPid) addToCart(window.currPid); closeModal('productModal'); };
 
         function startAdLoop() {
             if(adInterval) clearInterval(adInterval);
             const ads = products.filter(p => p.isSpecial || p.isPop);
             if(ads.length === 0) return;
-            // Short beep base64
-            const beep = new Audio("data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU"); 
-
             adInterval = setInterval(() => {
                 if(document.querySelector('.modal[style*="flex"]')) return;
                 const p = ads[Math.floor(Math.random() * ads.length)];
                 const popup = document.getElementById('adPopup');
-                if(!popup) return;
                 document.getElementById('adImg').src = p.image || '';
                 document.getElementById('adTitle').innerText = p.name;
                 popup.dataset.pid = p.id;
                 popup.style.display = 'block';
-                beep.play().catch(()=>{});
-                setTimeout(() => { if(popup.style.display === 'block') popup.style.display = 'none'; }, 6000);
+                setTimeout(() => popup.style.display = 'none', 6000);
             }, 15000);
         }
-
         window.closeAd = () => document.getElementById('adPopup').style.display = 'none';
-        window.goToAdProduct = () => {
-            const pid = document.getElementById('adPopup').dataset.pid;
-            showDetails(pid);
-            closeAd();
-        };
+        window.goToAdProduct = () => { showDetails(document.getElementById('adPopup').dataset.pid); closeAd(); };
 
-        renderProducts();
+        renderApp();
         updateCartUI();
     </script>
 </body>
