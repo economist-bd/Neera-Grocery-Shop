@@ -311,7 +311,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot, query, where, orderBy, getDocs, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot, query, where, getDocs, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDmhCAUKAu6wptvSazTIzXzqB1hsaPEcNk",
@@ -342,7 +342,7 @@
             document.getElementById('admin'+tab+'Tab').style.display = 'block';
         };
 
-        // --- AUTH ---
+        // --- AUTH SYSTEM ---
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
             const logoutBtn = document.getElementById('logoutBtn');
@@ -350,14 +350,14 @@
             const emailDisplay = document.getElementById('menuUserEmail');
 
             if(user) {
-                emailDisplay.innerText = user.email;
+                if(emailDisplay) emailDisplay.innerText = user.email;
                 if(logoutBtn) logoutBtn.style.display = 'block';
                 if(user.email === 'neera.shop@gmail.com') {
                     if(adminLink) adminLink.style.display = 'block';
-                    loadAdminData();
+                    loadAdminData(); // Admin Only Load
                 }
             } else {
-                emailDisplay.innerText = 'Guest';
+                if(emailDisplay) emailDisplay.innerText = 'Guest';
                 if(logoutBtn) logoutBtn.style.display = 'none';
                 if(adminLink) adminLink.style.display = 'none';
             }
@@ -387,21 +387,22 @@
         window.handleLogout = () => {
             signOut(auth).then(() => {
                 alert('Logged out');
-                toggleSidebar();
                 window.location.reload();
             });
         };
 
-        // --- OPTIMIZED RENDERING ---
+        // --- PRODUCTS SYSTEM (No Index Required) ---
         const renderProducts = () => {
-            // Using limits to prevent browser crash if DB is huge
-            const q = query(collection(db, "products"), orderBy("name")); 
+            // Simplified Query: No orderBy in DB to prevent Index Error
+            const q = collection(db, "products"); 
             
             onSnapshot(q, (snap) => {
                 products = [];
                 snap.forEach(d => products.push({id: d.id, ...d.data()}));
                 
-                // Optimized: Build strings first, then inject to DOM once
+                // Sort in JavaScript instead of Database
+                products.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+
                 let allHtml = '', popHtml = '', offerHtml = '';
                 
                 products.forEach(p => {
@@ -411,9 +412,14 @@
                     if(p.isSpecial || (p.discount && p.discount > 0)) offerHtml += card;
                 });
 
-                document.getElementById('allProductsList').innerHTML = allHtml;
-                document.getElementById('popularList').innerHTML = popHtml;
-                document.getElementById('offerList').innerHTML = offerHtml;
+                const allList = document.getElementById('allProductsList');
+                if(allList) allList.innerHTML = allHtml;
+                
+                const popList = document.getElementById('popularList');
+                if(popList) popList.innerHTML = popHtml;
+                
+                const offList = document.getElementById('offerList');
+                if(offList) offList.innerHTML = offerHtml;
                 
                 startAdLoop();
             });
@@ -433,10 +439,7 @@
         };
 
         function createCard(p) {
-            // Placeholder if image is missing or broken
             const img = p.image || 'https://placehold.co/150';
-            
-            // Calculate Price
             let displayPrice = `৳ ${p.price}`;
             let discTag = '';
             
@@ -485,7 +488,6 @@
             if(!imgEl) return;
 
             if(carouselInterval) clearInterval(carouselInterval);
-            
             let i = 0;
             imgEl.src = images[0];
             
@@ -499,62 +501,16 @@
             }, 5000);
         }
 
-        // --- AD SYSTEM ---
-        function startAdLoop() {
-            if(adInterval) clearInterval(adInterval);
-            
-            // Only targets products with special offers or popular
-            const ads = products.filter(p => p.isSpecial || p.isPop);
-            if(ads.length === 0) return;
-
-            // Short beep sound (optimized)
-            const beep = new Audio("data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU"); 
-
-            adInterval = setInterval(() => {
-                // Don't show if modal is open
-                if(document.querySelector('.modal[style*="flex"]')) return;
-
-                const p = ads[Math.floor(Math.random() * ads.length)];
-                const popup = document.getElementById('adPopup');
-                if(!popup) return;
-
-                document.getElementById('adImg').src = p.image || '';
-                document.getElementById('adTitle').innerText = p.name;
-                popup.dataset.pid = p.id;
-                
-                popup.style.display = 'block';
-                beep.play().catch(()=>{}); // Ignore autoplay errors
-
-                // Auto hide after 6s
-                setTimeout(() => { 
-                    if(popup.style.display === 'block') popup.style.display = 'none'; 
-                }, 6000);
-
-            }, 15000); // Increased interval to 15s to reduce annoyance/lag
-        }
-
-        window.closeAd = () => {
-            const el = document.getElementById('adPopup');
-            if(el) el.style.display = 'none';
-        }
-        
-        window.goToAdProduct = () => {
-            const pid = document.getElementById('adPopup').dataset.pid;
-            showDetails(pid);
-            closeAd();
-        };
-
-        // --- CART SYSTEM ---
+        // --- CART & CHECKOUT ---
         window.addToCart = (id) => {
             const p = products.find(x => x.id === id);
             if(p) {
                 cart.push(p);
                 updateCartUI();
-                // Visual feedback
                 const btn = event.target;
-                const originalText = btn.innerText;
+                const oldText = btn.innerText;
                 btn.innerText = "Added!";
-                setTimeout(()=> btn.innerText = originalText, 1000);
+                setTimeout(()=> btn.innerText = oldText, 1000);
             }
         };
 
@@ -568,7 +524,6 @@
 
             let total = 0;
             let html = '';
-            
             cart.forEach((item, idx) => {
                 const price = item.discount ? Math.round(item.price * (1 - item.discount/100)) : item.price;
                 total += parseInt(price);
@@ -578,7 +533,6 @@
                         <span>৳${price} <i class="fas fa-trash" style="color:red; cursor:pointer; margin-left:10px;" onclick="removeFromCart(${idx})"></i></span>
                     </div>`;
             });
-            
             list.innerHTML = html;
             document.getElementById('cartTotal').innerText = total;
         }
@@ -598,7 +552,7 @@
             const addr = document.getElementById('orderAddress').value;
 
             if(!name || !phone || !addr || cart.length === 0) {
-                alert("Please fill all details and add items.");
+                alert("Please fill details & add items.");
                 return;
             }
 
@@ -630,7 +584,7 @@
             }
         };
 
-        // --- ORDER HISTORY ---
+        // --- ORDER HISTORY (No Index Required) ---
         window.openOrderHistory = async () => {
             if(!currentUser) { openModal('authModal'); return; }
             
@@ -638,7 +592,8 @@
             const list = document.getElementById('orderList');
             list.innerHTML = '<p style="text-align:center;">Loading orders...</p>';
             
-            const q = query(collection(db, "orders"), where("userId", "==", currentUser.uid), orderBy("date", "desc"));
+            // Simplified Query: Only Filter, No Sort
+            const q = query(collection(db, "orders"), where("userId", "==", currentUser.uid));
             
             try {
                 const snaps = await getDocs(q);
@@ -649,8 +604,12 @@
                     return;
                 }
 
-                snaps.forEach(d => {
-                    const o = d.data();
+                // JS Sort (Newest first)
+                let myOrders = [];
+                snaps.forEach(d => myOrders.push({id: d.id, ...d.data()}));
+                myOrders.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+                myOrders.forEach(o => {
                     const canCancel = o.status !== 'Delivered' && o.status !== 'Cancelled';
                     const dateStr = new Date(o.date).toLocaleDateString();
                     const itemNames = o.items.map(i=>i.name).join(', ');
@@ -663,48 +622,79 @@
                             </div>
                             <div style="font-size:0.9rem; color:#555;">${itemNames}</div>
                             <div style="font-weight:bold; margin-top:5px;">Total: ৳${o.total}</div>
-                            ${canCancel ? `<button class="btn-add btn-cancel" onclick="cancelOrder('${d.id}')" style="margin-top:10px;">Cancel Order</button>` : ''}
+                            ${canCancel ? `<button class="btn-add btn-cancel" onclick="cancelOrder('${o.id}')" style="margin-top:10px;">Cancel Order</button>` : ''}
                         </div>`;
                 });
                 list.innerHTML = html;
             } catch (e) {
-                list.innerHTML = `<p style="color:red">Error loading orders: ${e.message}</p>`;
+                list.innerHTML = `<p style="color:red">Error: ${e.message}</p>`;
             }
         };
 
         window.cancelOrder = async (oid) => {
-            if(confirm("Are you sure you want to cancel?")) {
+            if(confirm("Cancel this order?")) {
                 await updateDoc(doc(db, "orders", oid), { status: "Cancelled" });
                 openOrderHistory();
             }
         };
 
-        // --- ADMIN: IMAGE COMPRESSION & UPLOAD ---
+        // --- ADMIN PANEL (No Index Required) ---
+        window.loadAdminData = () => {
+            // Simplified Query: No orderBy in DB
+            const q = collection(db, "orders");
+            
+            onSnapshot(q, (snap) => {
+                const list = document.getElementById('adminOrderList');
+                if(!list) return;
+                
+                let orders = [];
+                snap.forEach(d => orders.push({id: d.id, ...d.data()}));
+                
+                // JS Sort (Newest first)
+                orders.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+                let html = '';
+                orders.forEach(o => {
+                    const itemStr = o.items ? o.items.map(i=>i.name).join(', ') : 'No items';
+                    html += `
+                        <div class="order-card">
+                            <small>${new Date(o.date).toLocaleString()}</small><br>
+                            <strong>${o.name} - ${o.phone}</strong><br>
+                            Items: ${itemStr} - ৳${o.total}<br>
+                            <select onchange="updateOrderStatus('${o.id}', this.value)" style="margin-top:5px; background:${o.status==='Pending'?'#fff3cd':'#d4edda'}">
+                                <option value="Pending" ${o.status=='Pending'?'selected':''}>Pending</option>
+                                <option value="Delivered" ${o.status=='Delivered'?'selected':''}>Delivered</option>
+                                <option value="Cancelled" ${o.status=='Cancelled'?'selected':''}>Cancelled</option>
+                            </select>
+                        </div>`;
+                });
+                list.innerHTML = html;
+            });
+        }
+
+        window.updateOrderStatus = async (oid, status) => {
+            await updateDoc(doc(db, "orders", oid), { status });
+        };
+
         window.encodeImage = (el, targetId) => {
             const file = el.files[0];
             if(!file) return;
-
-            // Compression / Resizing Logic
             const reader = new FileReader();
             reader.readAsDataURL(file);
-            reader.onload = (event) => {
+            reader.onload = (e) => {
+                // Resize Image logic
                 const img = new Image();
-                img.src = event.target.result;
+                img.src = e.target.result;
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    // Resize to max width 400px
-                    const maxWidth = 400;
-                    const scaleSize = maxWidth / img.width;
-                    canvas.width = maxWidth;
-                    canvas.height = img.height * scaleSize;
-
+                    const mw = 400; // Max Width 400px
+                    const sc = mw / img.width;
+                    canvas.width = mw;
+                    canvas.height = img.height * sc;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    
-                    // Compress to JPEG 0.7 quality
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-                    document.getElementById(targetId).value = dataUrl;
-                    alert("Image processed & ready!");
+                    document.getElementById(targetId).value = canvas.toDataURL('image/jpeg', 0.7);
+                    alert("Image Ready!");
                 }
             }
         };
@@ -733,7 +723,7 @@
                 } else {
                     await addDoc(collection(db, "products"), data);
                 }
-                alert("Product Saved!");
+                alert("Saved!");
                 resetAdminForm();
             } catch(e) {
                 alert("Error: " + e.message);
@@ -766,37 +756,6 @@
             document.getElementById('pImgBase64').value = '';
         };
 
-        // --- ADMIN: ORDERS & SETTINGS ---
-        window.loadAdminData = () => {
-            onSnapshot(query(collection(db, "orders"), orderBy("date", "desc")), (snap) => {
-                const list = document.getElementById('adminOrderList');
-                if(!list) return;
-                
-                let html = '';
-                snap.forEach(d => {
-                    const o = d.data();
-                    const itemStr = o.items ? o.items.map(i=>i.name).join(', ') : 'No items';
-                    html += `
-                        <div class="order-card">
-                            <small>${new Date(o.date).toLocaleString()}</small><br>
-                            <strong>${o.name} - ${o.phone}</strong><br>
-                            Address: ${o.address}<br>
-                            Items: ${itemStr} - ৳${o.total}<br>
-                            <select onchange="updateOrderStatus('${d.id}', this.value)" style="margin-top:5px; background:${o.status==='Pending'?'#fff3cd':'#d4edda'}">
-                                <option value="Pending" ${o.status=='Pending'?'selected':''}>Pending</option>
-                                <option value="Delivered" ${o.status=='Delivered'?'selected':''}>Delivered</option>
-                                <option value="Cancelled" ${o.status=='Cancelled'?'selected':''}>Cancelled</option>
-                            </select>
-                        </div>`;
-                });
-                list.innerHTML = html;
-            });
-        }
-
-        window.updateOrderStatus = async (oid, status) => {
-            await updateDoc(doc(db, "orders", oid), { status });
-        };
-
         window.addCategory = async () => {
             const newCat = document.getElementById('newCatName').value;
             if(newCat) {
@@ -808,36 +767,26 @@
         };
 
         window.uploadBanner = (el) => {
-            // Reusing the encodeImage logic but for banners
             const file = el.files[0];
             if(!file) return;
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = async (e) => {
-                const imgBase64 = e.target.result; // For banner, high quality is slightly okay but risky
-                // Save directly to settings/banners array
-                // Warning: This replaces all banners for this demo simplicity
-                // A better approach is fetching current, appending, then saving
-                // For now, we will just set it as a single banner or overwrite
-                 await setDoc(doc(db, "settings", "banners"), { images: [imgBase64] }, {merge: true}); 
+                 await setDoc(doc(db, "settings", "banners"), { images: [e.target.result] }, {merge: true}); 
                  alert("Banner Updated!");
             }
         };
 
-        // Details Modal
+        // --- EXTRAS ---
         window.showDetails = (id) => {
             const p = products.find(x => x.id === id);
             if(!p) return;
-            
             document.getElementById('modalImg').src = p.image || '';
             document.getElementById('modalTitle').innerText = p.name;
-            
-            const discountedPrice = p.discount ? Math.round(p.price * (1 - p.discount/100)) : p.price;
-            
-            document.getElementById('modalPrice').innerHTML = `৳${discountedPrice}`;
+            const dPrice = p.discount ? Math.round(p.price * (1 - p.discount/100)) : p.price;
+            document.getElementById('modalPrice').innerHTML = `৳${dPrice}`;
             document.getElementById('modalDiscount').innerText = p.discount ? `Regular: ৳${p.price}` : '';
             document.getElementById('modalDesc').innerText = p.description || 'No description';
-            
             window.currentDetailsId = id;
             openModal('productModal');
         };
@@ -847,10 +796,36 @@
             closeModal('productModal');
         };
 
-        // Init
+        function startAdLoop() {
+            if(adInterval) clearInterval(adInterval);
+            const ads = products.filter(p => p.isSpecial || p.isPop);
+            if(ads.length === 0) return;
+            // Short beep base64
+            const beep = new Audio("data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU"); 
+
+            adInterval = setInterval(() => {
+                if(document.querySelector('.modal[style*="flex"]')) return;
+                const p = ads[Math.floor(Math.random() * ads.length)];
+                const popup = document.getElementById('adPopup');
+                if(!popup) return;
+                document.getElementById('adImg').src = p.image || '';
+                document.getElementById('adTitle').innerText = p.name;
+                popup.dataset.pid = p.id;
+                popup.style.display = 'block';
+                beep.play().catch(()=>{});
+                setTimeout(() => { if(popup.style.display === 'block') popup.style.display = 'none'; }, 6000);
+            }, 15000);
+        }
+
+        window.closeAd = () => document.getElementById('adPopup').style.display = 'none';
+        window.goToAdProduct = () => {
+            const pid = document.getElementById('adPopup').dataset.pid;
+            showDetails(pid);
+            closeAd();
+        };
+
         renderProducts();
         updateCartUI();
-
     </script>
 </body>
 </html>
