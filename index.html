@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Neera Grocery Shop</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2E7D32">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3724/3724720.png">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        /* --- CSS Start --- */
+        :root {
+            --primary: #2E7D32; /* Grocery Green */
+            --dark: #1b1f23;
+            --light: #ffffff;
+            --gray: #f5f5f5;
+            --text: #333;
+        }
+
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--gray);
+            padding-bottom: 70px; /* Space for bottom nav */
+            overscroll-behavior-y: contain;
+        }
+
+        /* Header */
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .logo { font-size: 1.2rem; font-weight: bold; display: flex; align-items: center; gap: 5px; }
+        .header-icons { display: flex; gap: 15px; }
+        .cart-icon { position: relative; cursor: pointer; }
+        .badge { position: absolute; top: -5px; right: -8px; background: red; color: white; border-radius: 50%; padding: 2px 5px; font-size: 10px; }
+
+        /* Marquee (Rolling News) */
+        .marquee-container {
+            background: #fff;
+            color: var(--primary);
+            padding: 5px;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #ddd;
+        }
+
+        /* Carousel */
+        .carousel {
+            position: relative;
+            width: 100%;
+            height: 180px;
+            overflow: hidden;
+            background: #ddd;
+        }
+        .carousel img { width: 100%; height: 100%; object-fit: cover; }
+        .carousel-text {
+            position: absolute; bottom: 20px; left: 10px; color: white; 
+            text-shadow: 1px 1px 3px black; background: rgba(0,0,0,0.5); padding: 5px;
+        }
+
+        /* Section Titles */
+        .section-title {
+            padding: 15px 15px 5px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--dark);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Horizontal Scroll Containers (Sliding Cards) */
+        .scroll-container {
+            display: flex;
+            overflow-x: auto;
+            gap: 10px;
+            padding: 10px 15px;
+            scroll-behavior: smooth;
+            scrollbar-width: none; /* Firefox */
+        }
+        .scroll-container::-webkit-scrollbar { display: none; }
+
+        /* Product Card */
+        .card {
+            min-width: 140px;
+            max-width: 140px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .card img { width: 100%; height: 100px; object-fit: cover; }
+        .card-body { padding: 8px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .card-title { font-size: 0.9rem; font-weight: 600; margin: 0; line-height: 1.2; }
+        .card-price { color: var(--primary); font-weight: bold; margin-top: 5px; }
+        .btn-add {
+            background: var(--primary); color: white; border: none; 
+            width: 100%; padding: 5px; border-radius: 5px; margin-top: 5px; cursor: pointer;
+        }
+        
+        /* Provider Logos */
+        .provider-logo {
+            min-width: 60px; height: 60px; border-radius: 50%; background: white; 
+            display: flex; align-items: center; justify-content: center; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); object-fit: contain; padding: 5px;
+        }
+
+        /* Payment Methods */
+        .payment-card { min-width: 80px; height: 40px; background: white; border-radius: 5px; display: flex; align-items: center; justify-content: center; }
+
+        /* Bottom Navigation / Guest Toolbar */
+        .bottom-nav {
+            position: fixed; bottom: 0; width: 100%; background: white; 
+            display: flex; justify-content: space-around; padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 1000;
+        }
+        .nav-item { text-align: center; font-size: 0.8rem; color: #666; cursor: pointer; text-decoration: none;}
+        .nav-item i { font-size: 1.2rem; margin-bottom: 2px; display: block; }
+        .nav-item.active { color: var(--primary); }
+
+        /* Modals & Drawers */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center;
+        }
+        .modal-content {
+            background: white; width: 90%; max-width: 400px; max-height: 90vh; 
+            overflow-y: auto; border-radius: 10px; padding: 20px; position: relative;
+        }
+        .close-btn { position: absolute; top: 10px; right: 15px; font-size: 1.5rem; cursor: pointer; }
+
+        /* Sidebar Menu */
+        .sidebar {
+            position: fixed; top: 0; left: -250px; width: 250px; height: 100%;
+            background: white; z-index: 3000; transition: 0.3s;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.2); overflow-y: auto;
+        }
+        .sidebar.open { left: 0; }
+        .sidebar-header { background: var(--primary); padding: 20px; color: white; }
+        .menu-item { padding: 15px; border-bottom: 1px solid #eee; display: block; color: #333; text-decoration: none; }
+        
+        /* Multi-dropdown */
+        details { padding: 10px 15px; border-bottom: 1px solid #eee; }
+        summary { cursor: pointer; font-weight: 500; list-style: none; display: flex; justify-content: space-between; }
+        details ul { list-style: none; padding-left: 20px; margin: 10px 0 0 0; }
+        details li { padding: 8px 0; }
+
+        /* Admin Styles */
+        .admin-controls input, .admin-controls textarea, .admin-controls select {
+            width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd;
+        }
+        .hidden { display: none !important; }
+        
+        /* PWA Install Button */
+        #installBtn {
+            background: #1b1f23; color: white; padding: 10px; text-align: center;
+            display: none; cursor: pointer; margin: 10px; border-radius: 5px;
+        }
+
+        /* Line Break Support */
+        .desc-text { white-space: pre-wrap; font-size: 0.9rem; color: #555; }
+
+        /* Formspree Contact */
+        .contact-form input, .contact-form textarea { width: 100%; padding: 10px; margin: 5px 0; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3>Neera Shop</h3>
+            <p>User: <span id="menuUserEmail">Guest</span></p>
+        </div>
+        <a href="#" class="menu-item" onclick="toggleSidebar()"><i class="fas fa-home"></i> Home</a>
+        
+        <details>
+            <summary>Categories <i class="fas fa-chevron-down"></i></summary>
+            <ul id="menuCategories">
+                <li>Grocery</li>
+                <li>Fruits</li>
+                <li>Vegetables</li>
+            </ul>
+        </details>
+
+        <a href="#" class="menu-item" onclick="openModal('loginModal')">Login / Sign Up</a>
+        <a href="#" class="menu-item" onclick="openModal('adminModal')" id="adminLink" style="display:none;">Admin Panel</a>
+        <div class="menu-item">
+            <small>Contact: 01715247588</small><br>
+            <div style="margin-top:5px; display:flex; gap:10px;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="24">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Facebook_Logo_%282019%29.png/1024px-Facebook_Logo_%282019%29.png" width="24">
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="sidebarOverlay" onclick="toggleSidebar()" style="z-index: 2500; background: rgba(0,0,0,0.5);"></div>
+
+    <header>
+        <div class="logo">
+            <i class="fas fa-bars" onclick="toggleSidebar()" style="cursor: pointer; margin-right: 10px;"></i>
+            Neera Shop
+        </div>
+        <div class="header-icons">
+            <i class="fas fa-search"></i>
+            <div class="cart-icon" onclick="openCart()">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="badge" id="cartCount">0</span>
+            </div>
+        </div>
+    </header>
+
+    <div id="installBtn">📲 Install App for Best Experience</div>
+
+    <div class="marquee-container">
+        <marquee id="rollingNews">Welcome to Neera Shop! Cash on Delivery available throughout Bangladesh.</marquee>
+    </div>
+
+    <div class="carousel" id="heroCarousel">
+        <img id="carouselImg" src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80" alt="Banner">
+        <div class="carousel-text">
+            <h3 id="carouselTitle">Fresh Food</h3>
+        </div>
+    </div>
+
+    <div class="section-title">Featured Categories</div>
+    <div class="scroll-container" id="categoryList">
+        </div>
+
+    <div class="section-title">
+        <span><i class="fas fa-heart" style="color:red"></i> Favorites</span>
+        <small>View All</small>
+    </div>
+    <div class="scroll-container" id="favoritesList">
+        </div>
+
+    <div class="section-title">
+        <span><i class="fas fa-fire" style="color:orange"></i> Popular Now</span>
+    </div>
+    <div class="scroll-container" id="popularList">
+        </div>
+
+    <div class="section-title">All Products</div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px;" id="allProductsList">
+        </div>
+
+    <div class="section-title">Our Partners</div>
+    <div class="scroll-container" id="providersList">
+        <img class="provider-logo" src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn">
+        <img class="provider-logo" src="https://cdn-icons-png.flaticon.com/512/732/732200.png" alt="Mail">
+        <img class="provider-logo" src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="Insta">
+    </div>
+
+    <div class="section-title">Payment Methods</div>
+    <div class="scroll-container">
+        <div class="payment-card"><i class="fas fa-money-bill-wave"></i> COD</div>
+        <div class="payment-card"><i class="fas fa-mobile-alt"></i> bkash</div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item active"><i class="fas fa-home"></i>Home</a>
+        <a href="#" class="nav-item" onclick="openModal('loginModal')"><i class="fas fa-user"></i>Account</a>
+        <a href="https://wa.me/8801715247588" class="nav-item"><i class="fab fa-whatsapp"></i>Chat</a>
+    </nav>
+
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('productModal')">&times;</span>
+            <img id="modalImg" src="" style="width:100%; height:200px; object-fit:cover; border-radius:10px;">
+            <h2 id="modalTitle" style="margin:10px 0;"></h2>
+            <h3 id="modalPrice" style="color:var(--primary);"></h3>
+            <p id="modalDesc" class="desc-text"></p>
+            <button class="btn-add" onclick="addToCartFromModal()" style="padding:15px; font-size:1.1rem;">Add to Cart</button>
+        </div>
+    </div>
+
+    <div id="cartModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('cartModal')">&times;</span>
+            <h2>Your Cart</h2>
+            <div id="cartItems" style="max-height: 300px; overflow-y: auto;"></div>
+            <div style="border-top:1px solid #ddd; margin-top:10px; padding-top:10px; font-weight:bold; display:flex; justify-content:space-between;">
+                <span>Total:</span> <span id="cartTotal">0</span> BDT
+            </div>
+            
+            <h3>Checkout (COD)</h3>
+            <form action="https://formspree.io/f/mkgklkga" method="POST" id="checkoutForm">
+                <input type="hidden" name="OrderDetails" id="orderData">
+                <input type="text" name="name" placeholder="Your Name" required style="width:100%; padding:8px; margin-bottom:5px;">
+                <input type="text" name="phone" placeholder="Phone Number" required style="width:100%; padding:8px; margin-bottom:5px;">
+                <textarea name="address" placeholder="Delivery Address" required style="width:100%; padding:8px;"></textarea>
+                <button type="submit" class="btn-add" style="background:#1b1f23; margin-top:10px;">Place Order (Cash On Delivery)</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="loginModal" class="modal">
+        <div class="modal-content" style="text-align: center;">
+            <span class="close-btn" onclick="closeModal('loginModal')">&times;</span>
+            <h2>Welcome</h2>
+            <input type="email" id="email" placeholder="Email" style="width:90%; padding:10px; margin:5px 0;">
+            <input type="password" id="password" placeholder="Password" style="width:90%; padding:10px; margin:5px 0;">
+            <button class="btn-add" onclick="handleLogin()">Login / Sign Up</button>
+            <p id="authMsg" style="color:red; font-size:0.8rem;"></p>
+        </div>
+    </div>
+
+    <div id="adminModal" class="modal">
+        <div class="modal-content admin-controls">
+            <span class="close-btn" onclick="closeModal('adminModal')">&times;</span>
+            <h2>Admin Panel</h2>
+            
+            <div style="border-bottom:1px solid #ddd; margin-bottom:15px;">
+                <h3>Add/Edit Product</h3>
+                <input type="hidden" id="editId">
+                <input type="text" id="pName" placeholder="Product Name">
+                <input type="number" id="pPrice" placeholder="Price">
+                <select id="pCat">
+                    <option value="Grocery">Grocery</option>
+                    <option value="Fruits">Fruits</option>
+                    <option value="Vegetables">Vegetables</option>
+                </select>
+                <input type="file" id="pFile" onchange="encodeImageFileAsURL(this)">
+                <input type="hidden" id="pImgBase64">
+                
+                <textarea id="pDesc" rows="4" placeholder="Description (Line breaks supported)"></textarea>
+                
+                <label><input type="checkbox" id="pFav" style="width:auto;"> Add to Favorites</label>
+                <label><input type="checkbox" id="pPop" style="width:auto;"> Add to Popular</label>
+                
+                <button class="btn-add" onclick="saveProduct()">Save Product</button>
+            </div>
+
+            <div>
+                <h3>Manage Site</h3>
+                <input type="text" id="adminMarquee" placeholder="Update Marquee News">
+                <button class="btn-add" style="background:#555;" onclick="updateSettings()">Update Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // --- FIREBASE SETUP ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDmhCAUKAu6wptvSazTIzXzqB1hsaPEcNk",
+            authDomain: "neera-d1df0.firebaseapp.com",
+            projectId: "neera-d1df0",
+            storageBucket: "neera-d1df0.firebasestorage.app",
+            messagingSenderId: "745022493052",
+            appId: "1:745022493052:web:4f57819eeca48090bc14f9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- STATE ---
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let currentModalProduct = null;
+        let products = [];
+
+        // --- DOM ELEMENTS ---
+        window.openModal = (id) => document.getElementById(id).style.display = 'flex';
+        window.closeModal = (id) => document.getElementById(id).style.display = 'none';
+        window.toggleSidebar = () => {
+            document.getElementById('sidebar').classList.toggle('open');
+            const overlay = document.getElementById('sidebarOverlay');
+            overlay.style.display = overlay.style.display === 'block' ? 'none' : 'block';
+        };
+
+        // --- AUTH ---
+        window.handleLogin = async () => {
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('password').value;
+            const msg = document.getElementById('authMsg');
+            
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+                closeModal('loginModal');
+                alert("Logged in!");
+            } catch (error) {
+                // Try create
+                try {
+                    await createUserWithEmailAndPassword(auth, email, pass);
+                    closeModal('loginModal');
+                    alert("Account created!");
+                } catch (createErr) {
+                    msg.innerText = error.message;
+                }
+            }
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('menuUserEmail').innerText = user.email;
+                // Simple admin check (In real app use Custom Claims)
+                if(user.email === 'neera.shop@gmail.com') {
+                    document.getElementById('adminLink').style.display = 'block';
+                }
+            } else {
+                document.getElementById('menuUserEmail').innerText = "Guest";
+            }
+        });
+
+        // --- PRODUCT MANAGEMENT (ADMIN) ---
+        window.encodeImageFileAsURL = (element) => {
+            var file = element.files[0];
+            var reader = new FileReader();
+            reader.onloadend = function() {
+                document.getElementById('pImgBase64').value = reader.result;
+            }
+            reader.readAsDataURL(file);
+        }
+
+        window.saveProduct = async () => {
+            const p = {
+                name: document.getElementById('pName').value,
+                price: document.getElementById('pPrice').value,
+                category: document.getElementById('pCat').value,
+                image: document.getElementById('pImgBase64').value, // Base64 string
+                description: document.getElementById('pDesc').value,
+                isFav: document.getElementById('pFav').checked,
+                isPop: document.getElementById('pPop').checked,
+                createdAt: new Date()
+            };
+
+            try {
+                await addDoc(collection(db, "products"), p);
+                alert("Product Saved!");
+                closeModal('adminModal');
+            } catch (e) {
+                alert("Error: " + e.message);
+            }
+        };
+
+        // --- FETCH & RENDER DATA ---
+        const renderApp = () => {
+            onSnapshot(collection(db, "products"), (snapshot) => {
+                products = [];
+                const favList = document.getElementById('favoritesList');
+                const popList = document.getElementById('popularList');
+                const allList = document.getElementById('allProductsList');
+                
+                favList.innerHTML = ''; popList.innerHTML = ''; allList.innerHTML = '';
+
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    data.id = doc.id;
+                    products.push(data);
+                    
+                    const cardHTML = createCardHTML(data);
+                    
+                    // Add to All
+                    allList.innerHTML += cardHTML;
+                    // Add to Fav
+                    if(data.isFav) favList.innerHTML += cardHTML;
+                    // Add to Pop
+                    if(data.isPop) popularList.innerHTML += cardHTML;
+                });
+            });
+        };
+
+        function createCardHTML(data) {
+            // Safe fallback image
+            const img = data.image || 'https://placehold.co/150';
+            return `
+            <div class="card">
+                <img src="${img}" onclick="showDetails('${data.id}')">
+                <div class="card-body">
+                    <h4 class="card-title" onclick="showDetails('${data.id}')">${data.name}</h4>
+                    <div class="card-price">৳ ${data.price}</div>
+                    <button class="btn-add" onclick="addToCart('${data.id}')">Add Cart</button>
+                </div>
+            </div>`;
+        }
+
+        // --- PRODUCT DETAILS ---
+        window.showDetails = (id) => {
+            const p = products.find(x => x.id === id);
+            currentModalProduct = p;
+            document.getElementById('modalImg').src = p.image || 'https://placehold.co/300';
+            document.getElementById('modalTitle').innerText = p.name;
+            document.getElementById('modalPrice').innerText = '৳ ' + p.price;
+            document.getElementById('modalDesc').innerText = p.description;
+            openModal('productModal');
+        };
+
+        window.addToCartFromModal = () => {
+            if(currentModalProduct) addToCart(currentModalProduct.id);
+            closeModal('productModal');
+        }
+
+        // --- CART LOGIC ---
+        window.addToCart = (id) => {
+            const p = products.find(x => x.id === id);
+            cart.push(p);
+            updateCartUI();
+        };
+
+        function updateCartUI() {
+            document.getElementById('cartCount').innerText = cart.length;
+            localStorage.setItem('cart', JSON.stringify(cart));
+            
+            // Render Cart Modal List
+            const list = document.getElementById('cartItems');
+            list.innerHTML = '';
+            let total = 0;
+            cart.forEach((item, index) => {
+                total += parseFloat(item.price);
+                list.innerHTML += `
+                    <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:5px;">
+                        <span>${item.name}</span>
+                        <span>${item.price} <i class="fas fa-trash" style="color:red; cursor:pointer;" onclick="removeFromCart(${index})"></i></span>
+                    </div>
+                `;
+            });
+            document.getElementById('cartTotal').innerText = total;
+            
+            // Prepare Order Data for Formspree
+            const orderSummary = cart.map(i => `${i.name} (${i.price})`).join(', ');
+            document.getElementById('orderData').value = `Total: ${total} | Items: ${orderSummary}`;
+        }
+
+        window.removeFromCart = (index) => {
+            cart.splice(index, 1);
+            updateCartUI();
+        };
+
+        window.openCart = () => {
+            updateCartUI();
+            openModal('cartModal');
+        };
+
+        // --- PWA INSTALL ---
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const btn = document.getElementById('installBtn');
+            btn.style.display = 'block';
+            
+            btn.addEventListener('click', () => {
+                btn.style.display = 'none';
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the A2HS prompt');
+                    }
+                    deferredPrompt = null;
+                });
+            });
+        });
+
+        // Initialize
+        renderApp();
+        updateCartUI();
+
+        // Register SW
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js')
+            .then(() => console.log('Service Worker Registered'));
+        }
+    </script>
+</body>
+</html>
