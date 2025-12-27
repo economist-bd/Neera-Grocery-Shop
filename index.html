@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Neera Grocery Shop</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2E7D32">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3724/3724720.png">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        /* --- CSS Start --- */
+        :root { --primary: #2E7D32; --accent: #FF5722; --dark: #1b1f23; --light: #ffffff; --gray: #f5f5f5; }
+        body { font-family: 'Hind Siliguri', sans-serif; margin: 0; padding: 0; background-color: var(--gray); padding-bottom: 70px; overscroll-behavior-y: contain; }
+        
+        /* Header */
+        header { background: var(--primary); color: white; padding: 10px 15px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .logo { font-size: 1.2rem; font-weight: bold; display: flex; align-items: center; gap: 5px; }
+        .cart-icon { position: relative; cursor: pointer; }
+        .badge { position: absolute; top: -5px; right: -8px; background: var(--accent); color: white; border-radius: 50%; padding: 2px 5px; font-size: 10px; }
+        
+        /* Sidebar & Overlay */
+        .sidebar { position: fixed; top: 0; left: -280px; width: 260px; height: 100%; background: white; z-index: 3000; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 2px 0 10px rgba(0,0,0,0.2); overflow-y: auto; }
+        .sidebar.open { left: 0; }
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2500; }
+        .sidebar-overlay.show { display: block; }
+        .menu-item { padding: 15px 20px; border-bottom: 1px solid #eee; display: block; color: #333; text-decoration: none; cursor: pointer; font-size: 1rem; }
+        .menu-item:hover { background: #f9f9f9; color: var(--primary); }
+        
+        /* Carousel */
+        .carousel { position: relative; width: 100%; height: 200px; overflow: hidden; background: #ddd; }
+        .carousel img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; opacity: 0; transition: opacity 0.8s ease-in-out; }
+        .carousel img.active { opacity: 1; }
+        
+        /* Section & Cards */
+        .section-title { padding: 15px 15px 5px; font-size: 1.1rem; font-weight: 700; color: var(--dark); display: flex; justify-content: space-between; }
+        .scroll-container { display: flex; overflow-x: auto; gap: 10px; padding: 10px 15px; scrollbar-width: none; }
+        .scroll-container::-webkit-scrollbar { display: none; }
+        
+        .card { min-width: 140px; max-width: 140px; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; position: relative; }
+        .card img { width: 100%; height: 100px; object-fit: cover; background: #eee; }
+        .card-body { padding: 8px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .card-title { font-size: 0.9rem; font-weight: 600; margin: 0; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .discount-tag { position: absolute; top: 5px; right: 5px; background: var(--accent); color: white; font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+        .btn-add { background: var(--primary); color: white; border: none; width: 100%; padding: 5px; border-radius: 4px; margin-top: 5px; cursor: pointer; font-size: 0.9rem; }
+        .btn-cancel { background: #d32f2f; }
+
+        /* Admin & Modals */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; align-items: center; justify-content: center; }
+        .modal-content { background: white; width: 90%; max-width: 400px; max-height: 90vh; overflow-y: auto; border-radius: 10px; padding: 20px; }
+        .close-btn { float: right; font-size: 1.5rem; cursor: pointer; margin-top: -10px; }
+        input, select, textarea { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 8px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 1000; }
+        .nav-item { text-align: center; font-size: 0.75rem; color: #666; cursor: pointer; }
+        .nav-item i { font-size: 1.2rem; margin-bottom: 2px; display: block; }
+        .nav-item.active { color: var(--primary); }
+
+        /* Floating Ad */
+        .ad-popup { position: fixed; bottom: 80px; right: 10px; width: 180px; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1500; display: none; padding: 8px; animation: slideIn 0.5s ease; }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        .ad-close { position: absolute; top: -8px; right: -8px; background: red; color: white; border-radius: 50%; width: 22px; height: 22px; line-height: 22px; text-align: center; cursor: pointer; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+    <div class="sidebar" id="sidebar">
+        <div style="background: var(--primary); padding: 25px 20px; color: white;">
+            <h3 style="margin:0;">Neera Shop</h3>
+            <p id="menuUserEmail" style="margin:5px 0 0 0; font-size: 0.9rem; opacity: 0.9;">Guest</p>
+        </div>
+        <div class="menu-item" onclick="closeSidebar(); window.scrollTo(0,0);"><i class="fas fa-home"></i> Home</div>
+        <div class="menu-item" onclick="closeSidebar(); openOrderHistory()"><i class="fas fa-box"></i> My Orders</div>
+        <div class="menu-item" onclick="closeSidebar(); openModal('cartModal')"><i class="fas fa-shopping-cart"></i> Cart</div>
+        <div class="menu-item" onclick="closeSidebar(); openModal('adminModal'); loadAdminData();" id="adminLink" style="display:none; color:var(--primary); font-weight:bold;"><i class="fas fa-user-shield"></i> Admin Panel</div>
+        <div class="menu-item" onclick="handleLogout()" id="logoutBtn" style="display:none; color:red;"><i class="fas fa-sign-out-alt"></i> Logout</div>
+        <div class="menu-item" style="font-size:0.8rem; color:#888; border:none;">Call: 01715247588</div>
+    </div>
+
+    <header>
+        <div class="logo">
+            <i class="fas fa-bars" onclick="openSidebar()" style="cursor: pointer; padding: 5px; font-size: 1.3rem;"></i>
+            Neera Grocery
+        </div>
+        <div class="cart-icon" onclick="openModal('cartModal')">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="badge" id="cartCount">0</span>
+        </div>
+    </header>
+
+    <div class="carousel" id="heroCarousel">
+        <img class="active" src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&q=80" alt="Banner 1">
+        </div>
+
+    <div class="section-title">Categories</div>
+    <div class="scroll-container" id="categoryList"></div>
+
+    <div class="section-title"><span><i class="fas fa-tags" style="color:var(--accent)"></i> Offers</span></div>
+    <div class="scroll-container" id="offerList"></div>
+
+    <div class="section-title"><span><i class="fas fa-fire" style="color:orange"></i> Popular</span></div>
+    <div class="scroll-container" id="popularList"></div>
+
+    <div class="section-title">All Products</div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px;" id="allProductsList"></div>
+    
+    <div style="height: 60px;"></div>
+
+    <div id="adPopup" class="ad-popup">
+        <div class="ad-close" onclick="closeAd()">&times;</div>
+        <div style="display:flex; gap:10px; align-items:center;">
+            <img id="adImg" src="" style="width:50px; height:50px; object-fit:cover; border-radius:5px;">
+            <div>
+                <small style="color:red; font-weight:bold;">Special Offer!</small>
+                <div id="adTitle" style="font-size:0.85rem; font-weight:600; line-height:1.1;"></div>
+                <button onclick="goToAdProduct()" style="background:var(--primary); color:white; border:none; border-radius:3px; font-size:0.7rem; padding:2px 5px; margin-top:2px;">View</button>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="window.scrollTo(0,0)"><i class="fas fa-home"></i>Home</div>
+        <div class="nav-item" onclick="openOrderHistory()"><i class="fas fa-list-alt"></i>Orders</div>
+        <a href="https://wa.me/8801715247588" class="nav-item"><i class="fab fa-whatsapp"></i>Chat</a>
+    </nav>
+
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('productModal')">&times;</span>
+            <img id="modalImg" src="" style="width:100%; height:200px; object-fit:cover; border-radius:10px;">
+            <h2 id="modalTitle" style="margin:10px 0;"></h2>
+            <h3 id="modalPrice" style="color:var(--primary);"></h3>
+            <p id="modalDesc" style="color:#555; white-space:pre-wrap;"></p>
+            <button class="btn-add" onclick="addToCartFromModal()" style="padding:15px; font-size:1.1rem;">Add to Cart</button>
+        </div>
+    </div>
+
+    <div id="cartModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('cartModal')">&times;</span>
+            <h2>Your Cart</h2>
+            <div id="cartItems" style="max-height: 250px; overflow-y: auto;"></div>
+            <div style="margin-top:10px; font-weight:bold; display:flex; justify-content:space-between;">
+                <span>Total:</span> <span id="cartTotal">0</span> BDT
+            </div>
+            <div id="checkoutSection" style="margin-top:15px; border-top:1px solid #eee; padding-top:10px;">
+                <input type="text" id="orderName" placeholder="Your Name" required>
+                <input type="text" id="orderPhone" placeholder="Mobile Number" required>
+                <textarea id="orderAddress" placeholder="Full Address" required></textarea>
+                <button class="btn-add" style="background:#1b1f23; margin-top:10px;" onclick="processCheckout()">Confirm Order (COD)</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="authModal" class="modal">
+        <div class="modal-content" style="text-align:center;">
+            <span class="close-btn" onclick="closeModal('authModal')">&times;</span>
+            <h2>Login Required</h2>
+            <input type="email" id="authEmail" placeholder="Email">
+            <input type="password" id="authPass" placeholder="Password">
+            <button class="btn-add" onclick="handleAuth()">Login / Register</button>
+            <p id="authMsg" style="color:red; margin-top:5px; font-size:0.8rem;"></p>
+        </div>
+    </div>
+
+    <div id="historyModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('historyModal')">&times;</span>
+            <h2>My Orders</h2>
+            <div id="orderList" style="max-height: 60vh; overflow-y: auto;"></div>
+        </div>
+    </div>
+
+    <div id="adminModal" class="modal">
+        <div class="modal-content" style="max-width:500px;">
+            <span class="close-btn" onclick="closeModal('adminModal')">&times;</span>
+            <h2 style="margin-top:0;">Admin Panel</h2>
+            
+            <div style="display:flex; gap:5px; margin-bottom:15px;">
+                <button onclick="showAdminTab('Prod')" class="btn-add">Products</button>
+                <button onclick="showAdminTab('Ord')" class="btn-add" style="background:var(--accent)">Orders</button>
+                <button onclick="showAdminTab('Set')" class="btn-add" style="background:#555">Settings</button>
+            </div>
+
+            <div id="adminProdTab">
+                <input type="hidden" id="pId">
+                <input type="text" id="pName" placeholder="Name">
+                <div style="display:flex; gap:5px;">
+                    <input type="number" id="pPrice" placeholder="Price">
+                    <input type="number" id="pDiscount" placeholder="Disc %">
+                </div>
+                <select id="pCatSelect"></select>
+                <input type="file" accept="image/*" onchange="encodeImage(this, 'pImgBase64')">
+                <input type="hidden" id="pImgBase64">
+                <textarea id="pDesc" rows="2" placeholder="Description"></textarea>
+                <div style="margin:5px 0;">
+                    <label><input type="checkbox" id="pIsPop"> Popular</label>
+                    <label><input type="checkbox" id="pIsSpecial"> Special Offer</label>
+                </div>
+                <button class="btn-add" onclick="saveProduct()">Save Product</button>
+                <button class="btn-add" style="background:#777;" onclick="resetAdminForm()">Clear</button>
+            </div>
+
+            <div id="adminOrdTab" style="display:none;">
+                <div id="adminOrderList" style="max-height:300px; overflow-y:auto; background:#f9f9f9; padding:5px;">Loading...</div>
+            </div>
+
+            <div id="adminSetTab" style="display:none;">
+                <h4>Add Category</h4>
+                <div style="display:flex; gap:5px;">
+                    <input type="text" id="newCatName" placeholder="Cat Name">
+                    <button class="btn-add" style="width:auto;" onclick="addCategory()">Add</button>
+                </div>
+                <h4>Upload Banner</h4>
+                <input type="file" accept="image/*" onchange="uploadBanner(this)">
+                <small style="color:red">Upload Landscape Images Only</small>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, doc, updateDoc, onSnapshot, query, where, getDocs, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDmhCAUKAu6wptvSazTIzXzqB1hsaPEcNk",
+            authDomain: "neera-d1df0.firebaseapp.com",
+            projectId: "neera-d1df0",
+            storageBucket: "neera-d1df0.firebasestorage.app",
+            messagingSenderId: "745022493052",
+            appId: "1:745022493052:web:4f57819eeca48090bc14f9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // State
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let products = [];
+        let categories = ['Grocery', 'Fruits', 'Vegetables'];
+        let currentUser = null;
+        let adInterval = null;
+
+        // --- UI Functions ---
+        window.openModal = (id) => document.getElementById(id).style.display = 'flex';
+        window.closeModal = (id) => document.getElementById(id).style.display = 'none';
+        
+        // Fix for Sidebar
+        window.openSidebar = () => {
+            document.getElementById('sidebar').classList.add('open');
+            document.getElementById('sidebarOverlay').classList.add('show');
+        };
+        window.closeSidebar = () => {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('show');
+        };
+
+        window.showAdminTab = (name) => {
+            ['Prod','Ord','Set'].forEach(t => document.getElementById('admin'+t+'Tab').style.display='none');
+            document.getElementById('admin'+name+'Tab').style.display='block';
+        };
+
+        // --- Auth ---
+        onAuthStateChanged(auth, u => {
+            currentUser = u;
+            if(u) {
+                document.getElementById('menuUserEmail').innerText = u.email;
+                document.getElementById('logoutBtn').style.display='block';
+                if(u.email === 'neera.shop@gmail.com') document.getElementById('adminLink').style.display='block';
+            } else {
+                document.getElementById('menuUserEmail').innerText = 'Guest';
+                document.getElementById('logoutBtn').style.display='none';
+                document.getElementById('adminLink').style.display='none';
+            }
+        });
+
+        window.handleAuth = async () => {
+            const e = document.getElementById('authEmail').value;
+            const p = document.getElementById('authPass').value;
+            try {
+                await signInWithEmailAndPassword(auth, e, p);
+                closeModal('authModal');
+                if(cart.length) openModal('cartModal');
+            } catch(err) {
+                try {
+                    await createUserWithEmailAndPassword(auth, e, p);
+                    closeModal('authModal');
+                    if(cart.length) openModal('cartModal');
+                } catch(e2) { alert(e2.message); }
+            }
+        };
+        window.handleLogout = () => signOut(auth).then(()=>window.location.reload());
+
+        // --- Data Rendering (Optimized) ---
+        const renderApp = () => {
+            const q = collection(db, "products");
+            onSnapshot(q, (snap) => {
+                products = [];
+                snap.forEach(d => products.push({id: d.id, ...d.data()}));
+                products.sort((a,b) => (a.name||"").localeCompare(b.name||""));
+
+                // Batch Generate HTML strings
+                const allHtml = products.map(p => createCard(p)).join('');
+                const popHtml = products.filter(p=>p.isPop).map(p => createCard(p)).join('');
+                const offHtml = products.filter(p=>p.isSpecial || p.discount > 0).map(p => createCard(p)).join('');
+
+                document.getElementById('allProductsList').innerHTML = allHtml;
+                document.getElementById('popularList').innerHTML = popHtml;
+                document.getElementById('offerList').innerHTML = offHtml;
+                
+                startAdLoop();
+            });
+
+            onSnapshot(collection(db, "settings"), (snap) => {
+                snap.forEach(d => {
+                    if(d.id==='categories') {
+                        categories = d.data().list || [];
+                        renderCategories();
+                    }
+                    if(d.id==='banners') {
+                        startCarousel(d.data().images || []);
+                    }
+                });
+            });
+        };
+
+        function createCard(p) {
+            const img = p.image || 'https://placehold.co/150';
+            const price = p.discount ? Math.round(p.price*(1-p.discount/100)) : p.price;
+            const displayPrice = p.discount ? `<s style="color:#aaa; font-size:0.8em">${p.price}</s> ৳${price}` : `৳${price}`;
+            const tag = p.discount ? `<div class="discount-tag">-${p.discount}%</div>` : '';
+            
+            return `<div class="card">
+                ${tag}
+                <img src="${img}" loading="lazy" onclick="showDetails('${p.id}')">
+                <div class="card-body">
+                    <div class="card-title" onclick="showDetails('${p.id}')">${p.name}</div>
+                    <div style="font-weight:bold; color:var(--primary);">${displayPrice}</div>
+                    <button class="btn-add" onclick="addToCart('${p.id}')">Add</button>
+                    ${currentUser?.email==='neera.shop@gmail.com' ? `<small onclick="editProduct('${p.id}')" style="color:blue;cursor:pointer;text-align:center;">Edit</small>` : ''}
+                </div>
+            </div>`;
+        }
+
+        function renderCategories() {
+            const html = categories.map(c => `<div style="min-width:80px;text-align:center;padding:10px;background:white;border-radius:8px;font-size:0.9rem;">${c}</div>`).join('');
+            document.getElementById('categoryList').innerHTML = html;
+            document.getElementById('pCatSelect').innerHTML = categories.map(c=>`<option value="${c}">${c}</option>`).join('');
+        }
+
+        // --- Carousel ---
+        let carInterval;
+        function startCarousel(images) {
+            if(!images || !images.length) return;
+            const container = document.getElementById('heroCarousel');
+            // Build slides
+            container.innerHTML = images.map((src, i) => `<img src="${src}" class="${i===0?'active':''}">`).join('');
+            
+            let idx = 0;
+            const slides = container.querySelectorAll('img');
+            
+            if(carInterval) clearInterval(carInterval);
+            carInterval = setInterval(() => {
+                slides[idx].classList.remove('active');
+                idx = (idx + 1) % slides.length;
+                slides[idx].classList.add('active');
+            }, 5000);
+        }
+
+        // --- Cart & Order ---
+        window.addToCart = (id) => {
+            const p = products.find(x => x.id === id);
+            if(p) { cart.push(p); updateCartUI(); }
+        };
+
+        function updateCartUI() {
+            document.getElementById('cartCount').innerText = cart.length;
+            localStorage.setItem('cart', JSON.stringify(cart));
+            const list = document.getElementById('cartItems');
+            let total = 0;
+            list.innerHTML = cart.map((item, i) => {
+                const price = item.discount ? Math.round(item.price*(1-item.discount/100)) : item.price;
+                total += parseInt(price);
+                return `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee;">
+                    <span>${item.name}</span>
+                    <span>৳${price} <i class="fas fa-trash" style="color:red; margin-left:10px; cursor:pointer;" onclick="removeFromCart(${i})"></i></span>
+                </div>`;
+            }).join('');
+            document.getElementById('cartTotal').innerText = total;
+        }
+
+        window.removeFromCart = (i) => { cart.splice(i,1); updateCartUI(); };
+
+        window.processCheckout = async () => {
+            if(!currentUser) { closeModal('cartModal'); openModal('authModal'); return; }
+            const name = document.getElementById('orderName').value;
+            const phone = document.getElementById('orderPhone').value;
+            const addr = document.getElementById('orderAddress').value;
+            if(!name || !phone || !addr || !cart.length) return alert("Fill all details!");
+
+            const order = {
+                userId: currentUser.uid,
+                userEmail: currentUser.email,
+                name, phone, address: addr,
+                items: cart,
+                total: document.getElementById('cartTotal').innerText,
+                status: 'Pending',
+                date: new Date().toISOString()
+            };
+
+            try {
+                await addDoc(collection(db, "orders"), order);
+                alert("Order Placed!");
+                cart = []; updateCartUI(); closeModal('cartModal');
+            } catch(e) { alert(e.message); }
+        };
+
+        // --- Admin ---
+        window.encodeImage = (el, tid) => {
+            if(el.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        // Strong Compression: Max Width 300px
+                        const scale = 300 / img.width;
+                        canvas.width = 300;
+                        canvas.height = img.height * scale;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        document.getElementById(tid).value = canvas.toDataURL('image/jpeg', 0.6);
+                        alert("Image Compressed & Ready!");
+                    }
+                };
+                reader.readAsDataURL(el.files[0]);
+            }
+        };
+
+        window.saveProduct = async () => {
+            const id = document.getElementById('pId').value;
+            const data = {
+                name: document.getElementById('pName').value,
+                price: document.getElementById('pPrice').value,
+                discount: document.getElementById('pDiscount').value || 0,
+                category: document.getElementById('pCatSelect').value,
+                description: document.getElementById('pDesc').value,
+                isPop: document.getElementById('pIsPop').checked,
+                isSpecial: document.getElementById('pIsSpecial').checked
+            };
+            const img = document.getElementById('pImgBase64').value;
+            if(img) data.image = img;
+
+            try {
+                if(id) await updateDoc(doc(db, "products", id), data);
+                else await addDoc(collection(db, "products"), data);
+                alert("Saved!");
+                resetAdminForm();
+            } catch(e) { alert(e.message); }
+        };
+
+        window.loadAdminData = () => {
+            onSnapshot(collection(db, "orders"), (snap) => {
+                const list = document.getElementById('adminOrderList');
+                if(!list) return;
+                let orders = [];
+                snap.forEach(d => orders.push({id: d.id, ...d.data()}));
+                orders.sort((a,b) => new Date(b.date) - new Date(a.date));
+                list.innerHTML = orders.map(o => `
+                    <div style="background:white; border:1px solid #ddd; padding:10px; margin-bottom:5px; border-radius:5px;">
+                        <small>${new Date(o.date).toLocaleDateString()}</small><br>
+                        <b>${o.name} (${o.phone})</b><br>
+                        Items: ${o.items.map(i=>i.name).join(', ')} - ৳${o.total}<br>
+                        <select onchange="updateOrderStatus('${o.id}', this.value)" style="margin-top:5px; background:${o.status==='Pending'?'#fff3cd':'#d4edda'}">
+                            <option value="Pending" ${o.status=='Pending'?'selected':''}>Pending</option>
+                            <option value="Delivered" ${o.status=='Delivered'?'selected':''}>Delivered</option>
+                            <option value="Cancelled" ${o.status=='Cancelled'?'selected':''}>Cancelled</option>
+                        </select>
+                    </div>`).join('');
+            });
+        };
+        window.updateOrderStatus = (oid, status) => updateDoc(doc(db, "orders", oid), { status });
+        
+        window.uploadBanner = (el) => {
+            if(el.files[0]) {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    // Check if doc exists, if not create, else append? 
+                    // Simpler: Just Fetch current, append, update.
+                    // For now, replacing to avoid complexity in this snippet
+                    // Ideally use arrayUnion but handling base64 array union can be tricky with limits
+                    // Let's just Add to array logic:
+                    // NOTE: Real app should resize banner too.
+                    await setDoc(doc(db, "settings", "banners"), { images: [e.target.result] }, {merge:true});
+                    alert("Banner Updated!");
+                };
+                reader.readAsDataURL(el.files[0]);
+            }
+        };
+
+        window.resetAdminForm = () => {
+            document.getElementById('pId').value = '';
+            document.querySelectorAll('#adminProdTab input').forEach(i => {
+                if(i.type==='text'||i.type==='number') i.value='';
+                if(i.type==='checkbox') i.checked=false;
+            });
+            document.getElementById('pDesc').value = '';
+            document.getElementById('pImgBase64').value = '';
+        };
+
+        window.editProduct = (id) => {
+            const p = products.find(x => x.id === id);
+            document.getElementById('pId').value = p.id;
+            document.getElementById('pName').value = p.name;
+            document.getElementById('pPrice').value = p.price;
+            document.getElementById('pDiscount').value = p.discount;
+            document.getElementById('pDesc').value = p.description;
+            document.getElementById('pIsPop').checked = p.isPop;
+            document.getElementById('pIsSpecial').checked = p.isSpecial;
+            document.getElementById('pCatSelect').value = p.category;
+            openModal('adminModal');
+            showAdminTab('Prod');
+        };
+        
+        window.addCategory = async () => {
+            const v = document.getElementById('newCatName').value;
+            if(v) { categories.push(v); await setDoc(doc(db,"settings","categories"),{list:categories}); alert("Added"); }
+        };
+
+        // --- User History ---
+        window.openOrderHistory = async () => {
+            if(!currentUser) { closeModal('sidebar'); openModal('authModal'); return; }
+            openModal('historyModal');
+            document.getElementById('orderList').innerHTML = 'Loading...';
+            const q = query(collection(db, "orders"), where("userId", "==", currentUser.uid));
+            const snaps = await getDocs(q);
+            let orders = [];
+            snaps.forEach(d=>orders.push({id:d.id, ...d.data()}));
+            orders.sort((a,b)=>new Date(b.date)-new Date(a.date));
+            document.getElementById('orderList').innerHTML = orders.length ? orders.map(o => `
+                <div style="border:1px solid #ddd; padding:10px; margin-bottom:5px; border-radius:5px;">
+                    <div style="display:flex; justify-content:space-between;"><b>${new Date(o.date).toLocaleDateString()}</b> <span>${o.status}</span></div>
+                    <p>${o.items.map(i=>i.name).join(', ')}</p>
+                    <p>Total: ৳${o.total}</p>
+                    ${o.status==='Pending'?`<button class="btn-add btn-cancel" onclick="cancelOrder('${o.id}')">Cancel</button>`:''}
+                </div>`).join('') : '<p>No orders.</p>';
+        };
+        window.cancelOrder = async (oid) => { if(confirm("Cancel?")) { await updateDoc(doc(db,"orders",oid),{status:'Cancelled'}); openOrderHistory(); }};
+
+        // --- Ad & Details ---
+        window.showDetails = (id) => {
+            const p = products.find(x=>x.id===id);
+            document.getElementById('modalImg').src = p.image||'';
+            document.getElementById('modalTitle').innerText = p.name;
+            const price = p.discount ? Math.round(p.price*(1-p.discount/100)) : p.price;
+            document.getElementById('modalPrice').innerText = `৳${price}`;
+            document.getElementById('modalDesc').innerText = p.description||'';
+            window.currPid = id;
+            openModal('productModal');
+        };
+        window.addToCartFromModal = () => { if(window.currPid) addToCart(window.currPid); closeModal('productModal'); };
+
+        function startAdLoop() {
+            if(adInterval) clearInterval(adInterval);
+            const ads = products.filter(p=>p.isPop||p.isSpecial);
+            if(!ads.length) return;
+            const beep = new Audio("data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU");
+            adInterval = setInterval(()=>{
+                if(document.querySelector('.modal[style*="flex"]')) return;
+                const p = ads[Math.floor(Math.random()*ads.length)];
+                const pop = document.getElementById('adPopup');
+                document.getElementById('adImg').src=p.image||'';
+                document.getElementById('adTitle').innerText=p.name;
+                pop.dataset.pid=p.id;
+                pop.style.display='block';
+                beep.play().catch(()=>{});
+                setTimeout(()=>pop.style.display='none', 6000);
+            }, 12000);
+        }
+        window.closeAd = () => document.getElementById('adPopup').style.display='none';
+        window.goToAdProduct = () => { showDetails(document.getElementById('adPopup').dataset.pid); closeAd(); };
+
+        renderApp();
+        updateCartUI();
+    </script>
+</body>
+</html>
